@@ -133,10 +133,12 @@
                 serverSide: true,
                 ajax: {
                     url: '{{ route('reports.data') }}',
+                    type: 'POST',
                     data: function (d) {
                         d.start_date = $('#start_date').val();
                         d.end_date = $('#end_date').val();
                         d.site_id = $('#site_id').val();
+                        d._token = $('meta[name="csrf-token"]').attr('content');
                     },
                     beforeSend: function() {
                         $('#loading-overlay').show();

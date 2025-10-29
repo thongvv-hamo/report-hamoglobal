@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/data', [ReportController::class, 'getData'])->name('reports.data');
+    Route::post('/reports/data', [ReportController::class, 'getData'])->name('reports.data');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
 });
 
