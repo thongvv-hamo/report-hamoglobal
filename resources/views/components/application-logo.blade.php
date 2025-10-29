@@ -1,0 +1,1 @@
+<img src="{{ asset('resources/assets/images/hamo-icon.jpg') }}" alt="Logo" class="h-10 w-auto">

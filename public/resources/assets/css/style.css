@@ -1,0 +1,546 @@
+.product_img_div {
+    display: flex;
+    height: 50px;
+    width: 50px;
+    align-items: center;
+    justify-content: center;
+}
+.product_img {
+    max-width: 95%;
+    max-height: 45px;
+    margin-right: 15px;
+}
+.dataTables_scrollBody thead tr {
+    visibility: hidden;
+}
+
+.text_td {
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.text_tooltip_td {
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.text_tooltip_td:hover span {
+    padding-right: 10px;
+    z-index: 100;
+    top: 3.5px;
+    background-color: #ffffff;
+    position: absolute;
+    white-space: nowrap;
+    width: auto;
+    overflow: visible;
+    text-overflow: unset;
+}
+.text_tooltip_td:hover {
+    overflow: visible;
+    text-overflow: unset;
+}
+/* table.dataTable .sorting_1 {
+    text-align: center;
+} */
+
+table.dataTable td {
+    font-size: 11px !important;
+    padding: 3.5px 10px !important;
+    white-space: nowrap;
+}
+
+table.dataTable thead th {
+    font-size: 11px !important;
+    text-align: left;
+    background-color: #e4e4e4 !important;
+    /* color: #000000 !important; */
+    border: 1px solid #ffffff !important;
+}
+
+.QA_section .QA_table .table thead th {
+    padding: 0px 10px !important;
+    text-transform: capitalize !important;
+    line-height: 250%;
+    font-weight: 550 !important;
+}
+.QA_section .QA_table .table thead th::after {
+    content: "" !important;
+}
+
+.QA_section.check_box_table .QA_table .table thead tr th:first-child {
+    padding-left: 10px !important;
+    text-align: center;
+}
+.check_box_table .QA_table .table thead th:nth-child(2) {
+    padding-left: 10px !important;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar {
+    height: 8px;
+}
+
+.height-30 {
+    height: 30px;
+}
+.select2-container {
+    margin-bottom: 0 !important;
+}
+
+.dropdown-menu {
+    display: none;
+    max-height: 400px;
+    overflow: auto;
+}
+.show-menu {
+    display: block !important;
+}
+
+.table_kpi_adjust table td {
+    font-size: 11px !important;
+    padding: 3.5px 10px !important;
+    white-space: nowrap;
+}
+
+.table_kpi_adjust table thead th {
+    padding: 3.5px 10px !important;
+    font-size: 11px !important;
+    background-color: #e4e4e4 !important;
+    /* color: #000000 !important; */
+    border: 1px solid #ffffff !important;
+    font-weight: 550 !important;
+}
+.QA_section .QA_table thead th {
+    padding-left: 10px !important;
+}
+
+.table_kpi_adjust {
+    overflow-x: scroll;
+}
+.table_kpi_adjust input,
+button {
+    font-size: 11px !important;
+}
+.table_kpi_adjust::-webkit-scrollbar {
+    height: 8px;
+}
+.table_kpi_adjust::-webkit-scrollbar-thumb {
+    background-color: #9038d8;
+}
+.table_kpi_adjust::-webkit-scrollbar-thumb:hover {
+    background-color: #9038d8c5;
+}
+
+.pagination {
+    align-items: center;
+    justify-content: end;
+    justify-items: end;
+    text-align: center;
+    margin: 2rem auto;
+}
+.form-adjust .page-item.active .page-link {
+    /* background-color: #9038d8; */
+    background: linear-gradient(
+        90deg,
+        #7c32ff 0%,
+        #c738d8 51%,
+        #7c32ff 100%
+    ) !important;
+}
+
+.page-item.active .page-link {
+    /* background: #9038d8; */
+    background: linear-gradient(
+        90deg,
+        #7c32ff 0%,
+        #c738d8 51%,
+        #7c32ff 100%
+    ) !important;
+}
+
+.text {
+    font-size: 11px !important;
+}
+.form-control-sm {
+    height: auto;
+}
+.btn-light {
+    background-color: #ffff !important;
+}
+
+.filter-option-inner-inner {
+    color: black;
+    font-weight: 300;
+}
+
+.report-commission table th,
+.report-commission table td {
+    font-size: 11px !important;
+    padding: 3.5px 10px !important;
+    white-space: nowrap;
+}
+
+.report-commission table thead th {
+    padding: 3.5px 10px !important;
+    font-size: 11px !important;
+}
+
+.report-commission {
+    overflow-x: scroll;
+}
+
+.report-commission input,
+button {
+    font-size: 11px !important;
+}
+
+.report-commission::-webkit-scrollbar {
+    height: 8px;
+}
+
+.report-commission::-webkit-scrollbar-thumb {
+    background-color: #9038d8;
+}
+
+.report-commission::-webkit-scrollbar-thumb:hover {
+    background-color: #9038d8c5;
+}
+
+.report-commission thead th,
+.report-commission tbody td {
+    color: #e4e4e4;
+    font-size: 14px;
+    color: #828bb2;
+    /* font-weight: 400; */
+    border: 1px solid rgba(130, 139, 178, 0.3);
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.text-red {
+    color: red;
+}
+
+.text-green {
+    color: green !important;
+}
+
+.text-black {
+    color: #415094 !important;
+}
+
+.background-yellow {
+    color: #415094 !important;
+    background: #fff2cc !important;
+}
+.background-green {
+    color: #415094 !important;
+    background: #e2efd9 !important;
+}
+
+.background-gray {
+    color: #415094 !important;
+    background: #f3f3f3 !important;
+}
+
+.background-blue {
+    background: #d9e2f3 !important;
+    color: #415094 !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+@media only screen and (min-width: 992px) {
+    .mobile-show {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .mobile-show {
+        display: block;
+    }
+}
+
+.select2-container--default.select2-container--disabled
+    .select2-selection--single {
+    background: transparent;
+}
+.table_class {
+    width: 100%;
+}
+
+/* style for div table user confirm */
+/* DivTable.com */
+.divTable {
+    display: table;
+    width: 100%;
+}
+.divTableRow {
+    display: table-row;
+}
+.divTableHeading {
+    background-color: #eee;
+    display: table-header-group;
+}
+.divTableCell,
+.divTableHead {
+    border: 1px solid #999999;
+    display: table-cell;
+    padding: 3px 10px;
+}
+.divTableHeading {
+    background-color: #eee;
+    display: table-header-group;
+    font-weight: bold;
+}
+.divTableFoot {
+    background-color: #eee;
+    display: table-footer-group;
+    font-weight: bold;
+}
+.divTableBody {
+    display: table-row-group;
+}
+
+.table-container {
+    width: 100%;
+    max-height: 600px;
+    overflow: auto;
+    position: relative;
+}
+
+.table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table-container td {
+    padding: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-size: 12px;
+    font-weight: normal;
+    vertical-align: middle;
+    word-wrap: break-word;
+}
+
+.table-container th {
+    background-color: #f3f3f3;
+    font-size: 12px;
+    border: solid 1px #cccccc;
+}
+
+/* Fix the header */
+.table-container thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* Fix the first column */
+.table-container tbody tr td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #fff;
+}
+
+.table-container thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+
+/* Styling for the checkbox and view icon */
+.table-container .action-cell {
+    align-items: center;
+}
+
+.table-container .view-icon {
+    cursor: pointer;
+}
+
+.box-30 {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+
+.progress-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    max-width: 1000px;
+    position: relative;
+}
+
+.progress-container .step {
+    text-align: center;
+    position: relative;
+    flex: 1;
+}
+
+.progress-container .step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 25%;
+    right: -38%;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 15px solid #ddd;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.progress-container .step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: 25%;
+    right: -31%;
+    width: 85%;
+    height: 4px;
+    border: solid 4px #ddd;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.backend-admin .step:not(:last-child)::after {
+    top: 13% !important;
+}
+
+.backend-admin .step:not(:last-child)::before {
+    top: 13% !important;
+}
+
+.progress-container .circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ddd;
+    color: #fff;
+    line-height: 30px;
+    text-align: center;
+    margin: 0 auto 10px;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.3s;
+    animation: none;
+}
+
+.progress-container .step.active .circle {
+    background: #4caf50;
+    transform: scale(1.2);
+}
+
+.progress-container .step.active:not(:last-child)::after {
+    border-left-color: #4caf50; /* Màu mũi tên khi bước được kích hoạt */
+}
+
+.progress-container .step.active:not(:last-child)::before {
+    border-color: #4caf50; /* Màu mũi tên khi bước được kích hoạt */
+}
+
+.progress-container .step.active p {
+    color: #4caf50;
+    /* font-weight: bold; */
+}
+
+.progress-container p {
+    color: #007bff;
+    font-size: 12px;
+}
+
+.progress-container p.selected_status {
+    color: #4caf50;
+    font-weight: 800;
+    position: relative;
+    border: solid 1px;
+    border-radius: 10px;
+}
+
+.progress-container p.selected_status::before {
+    content: "x";
+    position: absolute;
+    border-radius: 100%;
+    top: -10px;
+    right: -5px;
+    color: #008000;
+    /* padding: 3px; */
+    font-size: 13px;
+    background: #fff;
+    border: solid 1px;
+    width: 20px;
+    height: 20px;
+    line-height: 17px;
+}
+
+li.selected_status {
+    position: relative;
+}
+
+li.selected_status:before {
+    content: "x";
+    position: absolute;
+    border-radius: 100%;
+    top: -5px;
+    right: -5px;
+    color: #fff;
+    padding: 3px;
+    font-size: 10px;
+}
+
+.commission-confirm-log-backend {
+    height: inherit;
+    overflow-y: auto;
+    max-height: 300px;
+    direction: rtl;
+    /* width: 300px; */
+    /* top: 0; */
+}
+
+.commission-confirm-log-backend .log {
+    padding: 0px 5px;
+    border-bottom: solid 1px #ccc;
+    direction: ltr;
+}
+
+.commission-confirm-log-backend .log:last-child {
+    border-bottom: none;
+}
+
+.commission-confirm-log-user .log:last-child {
+    border-bottom: none !important;
+}
+
+.confirm-revenue {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.log-confirm-site-revenue {
+    border-bottom: solid 1px #ccc;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+.log-confirm-site-revenue:last-child {
+    border-bottom: none !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
