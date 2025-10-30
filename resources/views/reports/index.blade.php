@@ -8,6 +8,10 @@
         white-space: nowrap; /* Không cho xuống dòng */
         vertical-align: middle; /* Căn giữa theo chiều dọc */
     }
+    table.dataTable thead th {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
 
     /* Giới hạn chiều rộng */
     div.dataTables_wrapper {
@@ -48,7 +52,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Danh sách báo cáo') }}
+            {{ __('Báo cáo thô') }}
         </h2>
     </x-slot>
 
@@ -60,7 +64,7 @@
                     <div class="form-row align-items-end">
                         <!-- Từ ngày -->
                         <div class="form-group col-md-2">
-                            <label for="start_date" class="text-center d-block">Từ ngày</label>
+                            <label for="start_date" class="d-block">Từ ngày</label>
                             <input 
                                 type="date" 
                                 id="start_date" 
@@ -74,7 +78,7 @@
                 
                         <!-- Đến ngày -->
                         <div class="form-group col-md-2">
-                            <label for="end_date" class="text-center d-block">Đến ngày</label>
+                            <label for="end_date" class="d-block">Đến ngày</label>
                             <input 
                                 type="date" 
                                 id="end_date" 
@@ -88,13 +92,13 @@
                 
                         <!-- Cơ sở -->
                         <div class="form-group col-md-3">
-                            <label for="site_id" class="text-center d-block">Cơ sở</label>
+                            <label for="site_id" class="d-block">Cơ sở</label>
                             <select 
                                 id="site_id" 
                                 name="site_id" 
                                 class="form-control form-control-sm border border-secondary" 
                             >
-                                <option value="">Bỏ chọn</option>
+                                <option value="">-- Tất cả --</option>
                                 @foreach ($sites as $item)
                                     <option 
                                         value="{{ $item->IDPhongBan }}" 

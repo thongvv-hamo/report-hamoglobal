@@ -23,17 +23,22 @@ class ReportController extends Controller
             if ($_GET['start_date'] != '') {
                 $option['start_date'] = $_GET['start_date'];
             }
+        } else {
+            $option['start_date'] = now()->startOfMonth()->format('Y-m-d');
         }
         if (isset($_GET['end_date'])) {
             if ($_GET['end_date'] != '') {
                 $option['end_date'] = $_GET['end_date'];
             }
+        } else {
+            $option['end_date'] = now()->endOfMonth()->format('Y-m-d');
         }
         if (isset($_GET['site_id'])) {
             if ($_GET['site_id'] != '') {
                 $option['site_id'] = $_GET['site_id'];
             }
         }
+        // dd($option);
         $data['filters'] = $option;
         $data['sites'] = $this->reportService->getSites();
         // dd($data);
