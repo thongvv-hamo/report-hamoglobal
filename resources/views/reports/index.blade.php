@@ -69,7 +69,7 @@
                                 type="date" 
                                 id="start_date" 
                                 name="start_date" 
-                                class="form-control form-control-sm"
+                                class="form-control form-control-sm border border-secondary"
                                 @isset($filters['start_date']) 
                                     value="{{ date('Y-m-d', strtotime($filters['start_date'])) }}" 
                                 @endisset
@@ -83,7 +83,7 @@
                                 type="date" 
                                 id="end_date" 
                                 name="end_date" 
-                                class="form-control form-control-sm"
+                                class="form-control form-control-sm border border-secondary"
                                 @isset($filters['end_date']) 
                                     value="{{ date('Y-m-d', strtotime($filters['end_date'])) }}" 
                                 @endisset
@@ -91,7 +91,7 @@
                         </div>
                 
                         <!-- Cơ sở -->
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-4">
                             <label for="site_id" class="d-block">Cơ sở</label>
                             <select 
                                 id="site_id" 
@@ -220,8 +220,8 @@
                     { data: 'Note', title: 'Ghi chú' },
                 ],
                 language: {
-                    search: "<i class='ti-search'></i>",
-                    searchPlaceholder: "Tìm kiếm",
+                    search: "Tìm kiếm nhanh",
+                    searchPlaceholder: "Nhập từ khoá...",
                     lengthMenu: "Hiển thị _MENU_ dòng",
                     info: "Trang _PAGE_ / _PAGES_",
                     zeroRecords: "Không có dữ liệu phù hợp",
