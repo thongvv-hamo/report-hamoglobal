@@ -1,18 +1,18 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : HIS GANG PRODUCTION
+ Source Server         : 10.10.30.15
  Source Server Type    : SQL Server
- Source Server Version : 14001000 (14.00.1000)
- Source Host           : 10.20.1.147:1433
- Source Catalog        : His.hamoglobal_production
+ Source Server Version : 16004125 (16.00.4125)
+ Source Host           : 10.10.30.15:1433
+ Source Catalog        : NanoAppSpa_hamo_gang_dbtrue
  Source Schema         : dbo
 
  Target Server Type    : SQL Server
- Target Server Version : 14001000 (14.00.1000)
+ Target Server Version : 16004125 (16.00.4125)
  File Encoding         : 65001
 
- Date: 02/12/2025 10:17:38
+ Date: 02/12/2025 10:40:26
 */
 
 
@@ -354,7 +354,7 @@ BEGIN
 		'' AS 'Debit',
 		ListKtv.TenNhanVien AS 'Ktv',
 		ListDieuDuong.TenNhanVien AS 'Nursing',
-		'' AS 'RevenueConsultant',
+		ListTuVanVien.TenTuVanVien AS 'RevenueConsultant',
 		ListBS.TenNhanVien AS 'Doctor',
 		ListYTa.TenNhanVien AS 'Nurse',
 		'' AS 'Cashier',
@@ -396,6 +396,46 @@ BEGIN
 			LEFT JOIN DmNhanVien NV ON NV.IDNhanVien = TRY_CAST(s.value AS INT)
 			AND NV.IDNhanVien IN ( SELECT IDNhanVien FROM DmNhanVien WHERE IDNhomNhanVien = 36 )
 		) ListYTa
+		OUTER APPLY (
+			SELECT
+				STRING_AGG (NVX.DisplayName, ',') AS TenTuVanVien
+			FROM
+			(
+				SELECT
+					NV.IDNhanVien,
+					NHOM.NhomNhanVien + ' ' + NV.TenNhanVien + N'(' +
+					CASE
+						WHEN MAX(CAST (HH.LoaiHoaHong AS INT)) = 1 THEN
+							FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / CTDV.SoLuong / 100 AS DECIMAL(18, 2)), 'N2')
+						WHEN MAX(CAST (HH.LoaiHoaHong AS INT)) = 0 THEN
+							FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / CTDV.SoLuong / cb.TongTienThanhToan AS DECIMAL(18, 2)), 'N2')
+						ELSE
+							N'0'
+					END + N')' AS DisplayName
+				FROM
+					HoSoKhachHangChiTietDichVuSPThe_HoaHongNVTuVan HH
+					INNER JOIN DmNhanVien NV ON HH.IDNhanVien = NV.IDNhanVien
+					INNER JOIN DmNhomNhanVien NHOM ON NV.IDNhomNhanVien = NHOM.IDNhomNhanVien
+					CROSS APPLY (
+						SELECT CAST
+							(SUM(#TmpDV_TongTienThanhToan.TienThanhToan) AS DECIMAL (18, 0)) AS CTDV_TienThanhToan
+						FROM
+							#TmpDV_TongTienThanhToan
+						WHERE
+							#TmpDV_TongTienThanhToan.IDHoSoDichVuSanPhamThe = CTDV.IDHoSoDichVu
+					) AS ca
+					CROSS APPLY (SELECT CAST(LTDT.ThanhTien - ISNULL(LTDT.ThanhTienGiamGia, 0) - ISNULL(LTDT.ThanhTienGiamGiaHD, 0) AS DECIMAL(18,0)) AS TongTienThanhToan) AS cb
+				WHERE
+					HH.HoSoID = HS.IDHoSo
+					AND HH.IDDichVuSanPhamThe = CTDV.IDDichVu
+				GROUP BY
+					NV.IDNhanVien,
+					NHOM.NhomNhanVien,
+					NV.TenNhanVien,
+					CTDV_TienThanhToan,
+					TongTienThanhToan
+			) NVX
+	) ListTuVanVien
 	WHERE LTDT.NgayThucHien >= @startDate
 		AND LTDT.NgayThucHien < DATEADD(DAY, 1, @endDate)
 		AND (@siteID IS NULL OR HS.IDPhongBan = @siteID)
@@ -766,7 +806,7 @@ BEGIN
 		'' AS 'Debit',
 		ListKtv.TenNhanVien AS 'Ktv',
 		ListDieuDuong.TenNhanVien AS 'Nursing',
-		'' AS 'RevenueConsultant',
+		ListTuVanVien.TenTuVanVien AS 'RevenueConsultant',
 		ListBS.TenNhanVien AS 'Doctor',
 		ListYTa.TenNhanVien AS 'Nurse',
 		'' AS 'Cashier',
@@ -809,6 +849,41 @@ BEGIN
 			LEFT JOIN DmNhanVien NV ON NV.IDNhanVien = TRY_CAST(s.value AS INT)
 			AND NV.IDNhanVien IN ( SELECT IDNhanVien FROM DmNhanVien WHERE IDNhomNhanVien = 36 )
 		) ListYTa
+		OUTER APPLY (
+			SELECT 
+					STRING_AGG(NVX.DisplayName, ',') AS TenTuVanVien
+			FROM (
+					SELECT 
+							NV.IDNhanVien,
+							NHOM.NhomNhanVien + ' ' + NV.TenNhanVien 
+							+ N'(' + 
+									CASE 
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
+													THEN FORMAT(CAST(MAX(HH.HoaHong) * NULLIF(cb.TongTienThanhToan, 0) / 100 AS DECIMAL(18,2)), 'N2')
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
+													THEN FORMAT(CAST(MAX(HH.HoaHong) * NULLIF(cb.TongTienThanhToan, 0) / CTGoi_TienThanhToan AS DECIMAL(18,2)), 'N2')
+											ELSE N'0'
+									END 
+							+ N')' AS DisplayName
+					FROM HoSoKhachHangChiTietDichVuSPThe_HoaHongNVTuVan HH
+					INNER JOIN DmNhanVien NV 
+							ON HH.IDNhanVien = NV.IDNhanVien
+					INNER JOIN DmNhomNhanVien NHOM 
+							ON NV.IDNhomNhanVien = NHOM.IDNhomNhanVien
+					CROSS APPLY (
+							SELECT CAST
+								(SUM(#TmpGoi_TongTienThanhToan.TienThanhToan) AS DECIMAL (18, 0)) AS CTGoi_TienThanhToan
+							FROM
+								#TmpGoi_TongTienThanhToan
+							WHERE
+								#TmpGoi_TongTienThanhToan.IDHoSoDichVuSanPhamThe = CTGoi.IDHoSoComBoGoiDVSP
+					) AS ca
+					CROSS APPLY (SELECT CAST(LTDT.ThanhTien - ISNULL(LTDT.ThanhTienGiamGia, 0) - ISNULL(LTDT.ThanhTienGiamGiaHD, 0) AS DECIMAL(18,0)) AS TongTienThanhToan) AS cb
+					WHERE HH.HoSoID = HS.IDHoSo 
+							AND HH.IDDichVuSanPhamThe=CTGoi.IDComboGoiDVSP
+					GROUP BY NV.IDNhanVien, NHOM.NhomNhanVien, NV.TenNhanVien, ca.CTGoi_TienThanhToan, TongTienThanhToan
+			) NVX
+		) ListTuVanVien
 		LEFT JOIN DMPhongBanOFChiNhanh DMPB ON DMPB.IDPhongBan = HS.IDPhongBan
 	WHERE LTDT.NgayThucHien >= @startDate
 		AND LTDT.NgayThucHien < DATEADD(DAY, 1, @endDate)
@@ -1013,7 +1088,7 @@ BEGIN
 		'' AS 'Debit',
 		ListKtv.TenNhanVien AS 'Ktv',
 		ListDieuDuong.TenNhanVien AS 'Nursing',
-		'' AS 'RevenueConsultant',
+		ListTuVanVien.TenTuVanVien AS 'RevenueConsultant',
 		ListBS.TenNhanVien AS 'Doctor',
 		ListYTa.TenNhanVien AS 'Nurse',
 		'' AS 'Cashier',
@@ -1058,6 +1133,41 @@ BEGIN
 			LEFT JOIN DmNhanVien NV ON NV.IDNhanVien = TRY_CAST(s.value AS INT)
 			AND NV.IDNhanVien IN ( SELECT IDNhanVien FROM DmNhanVien WHERE IDNhomNhanVien = 36 )
 		) ListYTa
+		OUTER APPLY (		
+			SELECT 
+					STRING_AGG(NVX.DisplayName, ',') AS TenTuVanVien
+			FROM (
+					SELECT 
+							NV.IDNhanVien,
+							NHOM.NhomNhanVien + ' ' + NV.TenNhanVien 
+							+ N'(' + 
+									CASE 
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
+												THEN FORMAT(CAST(MAX(HH.HoaHong) * NULLIF(cb.TongTienThanhToan, 0) / 100 AS DECIMAL(18,2)), 'N2')
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
+												THEN FORMAT(CAST(MAX(HH.HoaHong) * NULLIF(cb.TongTienThanhToan, 0) / ca.CTTDV_TienThanhToan AS DECIMAL(18,2)), 'N2')
+											ELSE N'0'
+									END 
+							+ N')' AS DisplayName
+					FROM HoSoKhachHangChiTietDichVuSPThe_HoaHongNVTuVan HH
+					INNER JOIN DmNhanVien NV 
+							ON HH.IDNhanVien = NV.IDNhanVien
+					INNER JOIN DmNhomNhanVien NHOM 
+							ON NV.IDNhomNhanVien = NHOM.IDNhomNhanVien
+					CROSS APPLY (
+							SELECT CAST
+								(SUM(#TmpTDV_TongTienThanhToan.TienThanhToan) AS DECIMAL (18, 0)) AS CTTDV_TienThanhToan
+							FROM
+								#TmpTDV_TongTienThanhToan
+							WHERE
+								#TmpTDV_TongTienThanhToan.IDHoSoDichVuSanPhamThe = CTTDV.IDHoSoTheDVTV
+					) AS ca
+					CROSS APPLY (SELECT CAST(LTDT.ThanhTien - ISNULL(LTDT.ThanhTienGiamGia, 0) - ISNULL(LTDT.ThanhTienGiamGiaHD, 0) AS DECIMAL(18,0)) AS TongTienThanhToan) AS cb
+					WHERE HH.HoSoID = HS.IDHoSo 
+							AND HH.IDDichVuSanPhamThe = DMTDV.IDTheDichVu
+					GROUP BY NV.IDNhanVien, NHOM.NhomNhanVien, NV.TenNhanVien, ca.CTTDV_TienThanhToan, TongTienThanhToan
+			) NVX
+		) ListTuVanVien
 		LEFT JOIN DMPhongBanOFChiNhanh DMPB ON DMPB.IDPhongBan = HS.IDPhongBan
 	WHERE LTDT.NgayThucHien >= @startDate
 		AND LTDT.NgayThucHien < DATEADD(DAY, 1, @endDate)
