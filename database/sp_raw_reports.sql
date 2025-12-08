@@ -1,18 +1,18 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : 10.10.30.15
+ Source Server         : HIS GANG PRODUCTION
  Source Server Type    : SQL Server
- Source Server Version : 16004125 (16.00.4125)
- Source Host           : 10.10.30.15:1433
- Source Catalog        : NanoAppSpa_hamo_gang_dbtrue
+ Source Server Version : 14001000 (14.00.1000)
+ Source Host           : 10.20.1.147:1433
+ Source Catalog        : His.hamoglobal_production
  Source Schema         : dbo
 
  Target Server Type    : SQL Server
- Target Server Version : 16004125 (16.00.4125)
+ Target Server Version : 14001000 (14.00.1000)
  File Encoding         : 65001
 
- Date: 02/12/2025 10:40:26
+ Date: 08/12/2025 14:52:55
 */
 
 
@@ -232,7 +232,7 @@ BEGIN
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangChiTietDichVu_ChiTietThanhToan CTTT ON CTTT.IDHoSoDichVu = CTDV.IDHoSoDichVu
 		LEFT JOIN HoSoKhachHangChiTietDichVu_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoDichVu = CTDV.IDHoSoDichVu AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
 		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
@@ -365,7 +365,7 @@ BEGIN
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangLieuTrinhDieuTriDV LTDT ON LTDT.Id = CTDV.IDHoSoDichVu AND Type = 'DICH_VU' AND TrangThaiLieuTrinh = 2
 		LEFT JOIN DmDichVu DMDV ON DMDV.IDDichVu = CTDV.IDDichVu
 		LEFT JOIN DmNhomDichVu DMNDV ON DMNDV.IDNhomDichVu = DMDV.IDNhomDichVu
@@ -530,7 +530,7 @@ BEGIN
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietSanPham CTSP ON CTSP.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietSanPham CTSP ON CTSP.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangChiTietSanPham_ChiTietThanhToan CTTT ON CTTT.IDHoSoSanPham = CTSP.IDHoSoSanPham
 		LEFT JOIN HoSoKhachHangChiTietSanPham_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoSanPham = CTSP.IDHoSoSanPham AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
 		JOIN DmSanPham DMSP ON DMSP.ID = CTSP.SanPhamID
@@ -689,7 +689,7 @@ BEGIN
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangComBoGoiDVSP_ChiTietThanhToan CTTT ON CTTT.IDHoSoComBoGoiDVSP = CTGoi.IDHoSoComBoGoiDVSP
 		LEFT JOIN HoSoKhachHangComBoGoiDVSP_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoComBoGoiDVSP = CTGoi.IDHoSoComBoGoiDVSP AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
 		LEFT JOIN DmComboGoiDichVuSanPham DMGoi ON DMGoi.IDComboGoiDVSP = CTGoi.IDComboGoiDVSP
@@ -817,12 +817,12 @@ BEGIN
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.HoSoID=HS.IDHoSo
 		INNER JOIN DmComboGoiDichVuSanPham DMGoi ON DMGoi.IDComboGoiDVSP = CTGoi.IDComboGoiDVSP
 		INNER JOIN DmComboGoiDichVuSanPhamChiTiet DMGoiCT ON DMGoiCT.IDComboGoiDVSP = DMGoi.IDComboGoiDVSP AND DMGoiCT.Loai = 1 -- Dịch vụ
-		INNER JOIN HoSoKhachHangLieuTrinhDieuTriDV LTDT ON LTDT.MaHoSo = HS.MaHoSo AND LTDT.IDDichVu = DMGoiCT.IDDichVuSanPham AND Type = 'GOI' AND TrangThaiLieuTrinh = 2
+		INNER JOIN HoSoKhachHangLieuTrinhDieuTriDV LTDT ON LTDT.HoSoID=HS.IDHoSo AND LTDT.IDDichVu = DMGoiCT.IDDichVuSanPham AND Type = 'GOI' AND TrangThaiLieuTrinh = 2
 		LEFT JOIN DmDichVu DMDV ON DMDV.IDDichVu = DMGoiCT.IDDichVuSanPham
-		LEFT JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.MaHoSo = HS.MaHoSo AND CTDV.IDDichVu = DMDV.IDDichVu
+		LEFT JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.HoSoID=HS.IDHoSo AND CTDV.IDDichVu = DMDV.IDDichVu
 		OUTER APPLY (
 			SELECT STRING_AGG(NV.TenNhanVien, ',') AS TenNhanVien
 			FROM STRING_SPLIT(LTDT.ListIDNhanVien, ',') s
@@ -969,7 +969,7 @@ BEGIN
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangChiTietTheDichVu_ChiTietThanhToan CTTT ON CTTT.IDHoSoTheDVTV = CTTDV.IDHoSoTheDVTV
 		LEFT JOIN HoSoKhachHangChiTietTheDichVu_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoTheDVTV = CTTDV.IDHoSoTheDVTV AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
 		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
@@ -1099,12 +1099,12 @@ BEGIN
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.HoSoID=HS.IDHoSo
 		INNER JOIN TheDichVu_CauHinhThe CHT ON CHT.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
 		INNER JOIN TheDichVu_CauHinhTheDichVuChitiet CHTCT ON CHTCT.IDCauHinhThe = CHT.ID
 		INNER JOIN TheDichVu_CauHinhThe_KhachHang CHTKH ON CHTKH.IDHoSo = HS.IDHoSo AND CHTKH.IDCauHinhThe = CHTCT.IDCauHinhThe
 		INNER JOIN DmDichVu DMDV ON DMDV.IDDichVu = CHTCT.IDDichVu
-		INNER JOIN HoSoKhachHangLieuTrinhDieuTriDV LTDT ON LTDT.MaHoSo = HS.MaHoSo AND LTDT.IDDichVu = CHTCT.IDDichVu AND LTDT.TrangThaiLieuTrinh = 2
+		INNER JOIN HoSoKhachHangLieuTrinhDieuTriDV LTDT ON LTDT.HoSoID=HS.IDHoSo AND LTDT.IDDichVu = CHTCT.IDDichVu AND LTDT.TrangThaiLieuTrinh = 2
 		LEFT JOIN TheDichVu DMTDV ON DMTDV.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
 		LEFT JOIN DmLoaiTheDichVu DMLT ON DMLT.IDLoaiTheDichVu = DMTDV.IDLoaiTheDichVu
 		OUTER APPLY (
@@ -1229,7 +1229,7 @@ BEGIN
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.HoSoID=HS.IDHoSo
 		INNER JOIN PhieuThuChi CTTT ON CTTT.HoSoID = HS.IDHoSo
 		LEFT JOIN DmDichVu DMDV ON DMDV.IDDichVu = CTDV.IDDichVu
 		LEFT JOIN DmNhomDichVu DMNDV ON DMNDV.IDNhomDichVu = DMDV.IDNhomDichVu
@@ -1347,7 +1347,7 @@ BEGIN
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietSanPham CTSP ON CTSP.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietSanPham CTSP ON CTSP.HoSoID=HS.IDHoSo
 		INNER JOIN PhieuThuChi CTTT ON CTTT.HoSoID = HS.IDHoSo
 		LEFT JOIN DmSanPham DMSP ON DMSP.ID = CTSP.SanPhamID
 		LEFT JOIN DmNhomSanPham DMNSP ON DMNSP.ID = DMSP.NhomSanPhamID
@@ -1465,7 +1465,7 @@ BEGIN
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.HoSoID=HS.IDHoSo
 		INNER JOIN PhieuThuChi CTTT ON CTTT.HoSoID = HS.IDHoSo
 		LEFT JOIN DmComboGoiDichVuSanPham DMGoi ON DMGoi.IDComboGoiDVSP = CTGoi.IDComboGoiDVSP
 		LEFT JOIN PQ_User ThuNgan ON ThuNgan.Id=HS.NguoiDungID
@@ -1580,7 +1580,7 @@ BEGIN
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
-		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.MaHoSo = HS.MaHoSo
+		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.HoSoID=HS.IDHoSo
 		INNER JOIN PhieuThuChi CTTT ON CTTT.HoSoID = HS.IDHoSo
 		LEFT JOIN TheDichVu DMTDV ON DMTDV.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
 		LEFT JOIN DmLoaiTheDichVu DMLT ON DMLT.IDLoaiTheDichVu = DMTDV.IDLoaiTheDichVu
