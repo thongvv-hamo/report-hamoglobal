@@ -12,7 +12,7 @@
  Target Server Version : 14001000 (14.00.1000)
  File Encoding         : 65001
 
- Date: 08/12/2025 14:52:55
+ Date: 23/12/2025 16:21:30
 */
 
 
@@ -607,7 +607,14 @@ BEGIN
 			CSKH.TenNhanVien,
 			HS.CuMoi,
 			HS.GhiChu
-	HAVING NOT ( MAX(DCFlag) = 1 AND STRING_AGG(CTTT.MaHTTT, ',') IN ('TRUCOC,CN','CN,TRUCOC')) -- Loại bỏ đơn đặt cọc khấu trừ từ đơn gốc
+		HAVING NOT ( 
+			MAX(DCFlag) = 1 
+			AND MAX(CASE WHEN CTTT.MaHTTT = 'TRUCOC' THEN 1 ELSE 0 END) = 1
+			AND MAX(CASE WHEN CTTT.MaHTTT = 'CN' THEN 1 ELSE 0 END) = 1 
+			AND MAX(CASE WHEN CTTT.MaHTTT = 'TM' THEN 1 ELSE 0 END) = 0 
+			AND MAX(CASE WHEN CTTT.MaHTTT = 'CK' THEN 1 ELSE 0 END) = 0 
+			AND MAX(CASE WHEN CTTT.MaHTTT = 'QT' THEN 1 ELSE 0 END) = 0 
+		) -- Loại bỏ đơn đặt cọc khấu trừ từ đơn gốc
 		
 		UNION ALL 
 		
