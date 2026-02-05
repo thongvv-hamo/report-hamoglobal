@@ -159,13 +159,13 @@ BEGIN
 		 DMPB.TenPhongBan AS 'SiteName',
 		CASE
 			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 					 THEN N'Thanh toán công nợ'
 			ELSE N'Mua'
 			END AS 'Type',
 		CASE
 	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 					 THEN 'PAID_' + HS.MaHoSo
 			ELSE HS.MaHoSo
 		END AS 'Order',
@@ -176,25 +176,25 @@ BEGIN
 		DMNDV.TenNhomDichVu AS 'ProductGroup',
 		DMDV.MaDichVu AS 'Code',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN N'Thanh toán đơn ' + HS.MaHoSo + N' - ' + CONVERT (VARCHAR(10), MIN(HSCN.NgayThanhToan), 103) + N' - ' + DMDV.TenDichVu
 			ELSE DMDV.TenDichVu END AS 'Description',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTDV.DonGia END AS 'UnitPrice',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN 1
 			ELSE CTDV.SoLuong END AS 'Quantity',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTDV.ThanhTien END AS 'Total',
 		CTDV.GiamGia AS 'DiscountPercent',
 		CTDV.ThanhTienGiamGia AS 'DiscountAmount',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTDV.TienThanhToan END AS 'PaymentAmount',
 		'' AS 'DeductfromAccountCard',
@@ -234,7 +234,7 @@ BEGIN
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
 		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangChiTietDichVu_ChiTietThanhToan CTTT ON CTTT.IDHoSoDichVu = CTDV.IDHoSoDichVu
-		LEFT JOIN HoSoKhachHangChiTietDichVu_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoDichVu = CTDV.IDHoSoDichVu AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
+		LEFT JOIN HoSoKhachHangChiTietDichVu_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan <= 0 AND HSCN.IDHoSoDichVu = CTDV.IDHoSoDichVu AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan >= 0
 		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
 		LEFT JOIN PhieuThanhToanChiTiet_NganHang TTNH ON TTNH.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
 		OUTER APPLY (
@@ -454,9 +454,9 @@ BEGIN
 		END AS 'Type',
 		CASE
 	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 AND MAX(DCFlag) = 1
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND MAX(DCFlag) = 1
 					 THEN 'PCD_' + HS.MaHoSo -- Đơn đặt cọc
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
 					 THEN 'PAID_' + HS.MaHoSo
 			ELSE HS.MaHoSo
 		END AS 'Order',
@@ -467,7 +467,7 @@ BEGIN
 		DMNSP.TenNhomSanPham AS 'ProductGroup',
 		DMSP.MaSanPham AS 'Code',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
 				THEN N'Thanh toán đơn ' + HS.MaHoSo + N' - ' + CONVERT (VARCHAR(10), MIN(HSCN.NgayThanhToan), 103) + N' - ' + DMSP.TenSanPham
 			ELSE DMSP.TenSanPham END AS 'Description',
 		CASE
@@ -477,7 +477,7 @@ BEGIN
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTSP.DonGia END AS 'UnitPrice',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0) 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0) 
 				THEN 1
 			ELSE CTSP.SoLuong END AS 'Quantity',
 		CASE
@@ -623,13 +623,13 @@ BEGIN
 		 DMPB.TenPhongBan AS 'SiteName',
 		CASE
 			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 					 THEN N'Thanh toán công nợ'
 			ELSE N'Mua'
 		END AS 'Type',
 		CASE
 	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 					 THEN 'PAID_' + HS.MaHoSo
 			ELSE HS.MaHoSo
 		END AS 'Order',
@@ -640,25 +640,25 @@ BEGIN
 		DMGoi.TenComboGoiDVSP AS 'ProductGroup',
 		DMGoi.MaGoi AS 'Code',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN N'Thanh toán đơn ' + HS.MaHoSo + N' - ' + CONVERT (VARCHAR(10), MIN(HSCN.NgayThanhToan), 103) + N' - ' + DMGoi.TenComboGoiDVSP
 			ELSE DMGoi.TenComboGoiDVSP END AS 'Description',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE DMGoi.GiaBan END AS 'UnitPrice',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN 1
 			ELSE CTGoi.SoLuong END AS 'Quantity',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTGoi.ThanhTien END AS 'Total',
 		CTGoi.GiamGia AS 'DiscountPercent',
 		CTGoi.ThanhTienGiamGia AS 'DiscountAmount',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTGoi.TienThanhToan END AS 'PaymentAmount',
 		'' AS 'DeductfromAccountCard',
@@ -903,13 +903,13 @@ BEGIN
 		 DMPB.TenPhongBan AS 'SiteName',
 		CASE
 			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 					 THEN N'Thanh toán công nợ'
 			ELSE N'Mua'
 		END AS 'Type',
 		CASE
 	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 					 THEN 'PAID_' + HS.MaHoSo
 			ELSE HS.MaHoSo
 		END AS 'Order',
@@ -920,25 +920,25 @@ BEGIN
 		DMLT.TenLoaiTheDichVu AS 'ProductGroup',
 		DMTDV.MaTheDichVu AS 'Code',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN N'Thanh toán đơn ' + HS.MaHoSo + N' - ' + CONVERT (VARCHAR(10), MIN(HSCN.NgayThanhToan), 103) + N' - ' + DMTDV.TenTheDichVu
 			ELSE DMTDV.TenTheDichVu END AS 'Description',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTTDV.DonGiaBan END AS 'UnitPrice',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN 1
 			ELSE CTTDV.SoLuong END AS 'Quantity',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTTDV.ThanhTien END AS 'Total',
 		CTTDV.GiamGia AS 'DiscountPercent',
 		CTTDV.ThanhTienGiamGia AS 'DiscountAmount',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTTDV.TienThanhToan END AS 'PaymentAmount',
 		'' AS 'DeductfromAccountCard',
@@ -1109,7 +1109,7 @@ BEGIN
 		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.HoSoID=HS.IDHoSo
 		INNER JOIN TheDichVu_CauHinhThe CHT ON CHT.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
 		INNER JOIN TheDichVu_CauHinhTheDichVuChitiet CHTCT ON CHTCT.IDCauHinhThe = CHT.ID
-		INNER JOIN TheDichVu_CauHinhThe_KhachHang CHTKH ON CHTKH.IDHoSo = HS.IDHoSo AND CHTKH.IDCauHinhThe = CHTCT.IDCauHinhThe
+		LEFT JOIN TheDichVu_CauHinhThe_KhachHang CHTKH ON CHTKH.IDHoSo = HS.IDHoSo AND CHTKH.IDCauHinhThe = CHTCT.IDCauHinhThe
 		INNER JOIN DmDichVu DMDV ON DMDV.IDDichVu = CHTCT.IDDichVu
 		INNER JOIN HoSoKhachHangLieuTrinhDieuTriDV LTDT ON LTDT.HoSoID=HS.IDHoSo AND LTDT.IDDichVu = CHTCT.IDDichVu AND LTDT.TrangThaiLieuTrinh = 2
 		LEFT JOIN TheDichVu DMTDV ON DMTDV.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
@@ -1274,7 +1274,8 @@ BEGIN
 		) ListTuVanVien
 		WHERE HS.MaHoSo LIKE '%_HH0%' 
 			AND CTTT.LoaiThuChi = 2 
-			AND CTTT.MaPhanLoaiThuChi = 'VH14'
+			AND CTTT.MaPhanLoaiThuChi = 'VH14' 
+			AND CTTT.MaHTTT IN ('TM', 'CK', 'QT')
 			AND CTTT.NgayThuChi >= @startDate
 			AND CTTT.NgayThuChi < DATEADD(DAY, 1, @endDate)
 			AND (@siteID IS NULL OR HS.IDPhongBan = @siteID)
@@ -1392,7 +1393,8 @@ BEGIN
 		) ListTuVanVien
 		WHERE HS.MaHoSo LIKE '%_HH0%' 
 			AND CTTT.LoaiThuChi = 2 
-			AND CTTT.MaPhanLoaiThuChi = 'VH14'
+			AND CTTT.MaPhanLoaiThuChi = 'VH14' 
+			AND CTTT.MaHTTT IN ('TM', 'CK', 'QT')
 			AND CTTT.NgayThuChi >= @startDate
 			AND CTTT.NgayThuChi < DATEADD(DAY, 1, @endDate)
 			AND (@siteID IS NULL OR HS.IDPhongBan = @siteID)
@@ -1509,7 +1511,8 @@ BEGIN
 		) ListTuVanVien
 		WHERE HS.MaHoSo LIKE '%_HH0%' 
 			AND CTTT.LoaiThuChi = 2 
-			AND CTTT.MaPhanLoaiThuChi = 'VH14'
+			AND CTTT.MaPhanLoaiThuChi = 'VH14' 
+			AND CTTT.MaHTTT IN ('TM', 'CK', 'QT')
 			AND CTTT.NgayThuChi >= @startDate
 			AND CTTT.NgayThuChi < DATEADD(DAY, 1, @endDate)
 			AND (@siteID IS NULL OR HS.IDPhongBan = @siteID)
@@ -1624,7 +1627,8 @@ BEGIN
 		) ListTuVanVien
 		WHERE HS.MaHoSo LIKE '%_HH0%' 
 			AND CTTT.LoaiThuChi = 2 
-			AND CTTT.MaPhanLoaiThuChi = 'VH14'
+			AND CTTT.MaPhanLoaiThuChi = 'VH14' 
+			AND CTTT.MaHTTT IN ('TM', 'CK', 'QT')
 			AND CTTT.NgayThuChi >= @startDate
 			AND CTTT.NgayThuChi < DATEADD(DAY, 1, @endDate)
 			AND (@siteID IS NULL OR HS.IDPhongBan = @siteID)
@@ -1749,7 +1753,8 @@ BEGIN
 		) ListTuVanVien
 		WHERE HS.MaHoSo LIKE '%_HH0%' 
 			AND CTTT.LoaiThuChi = 1 
-			AND CTTT.MaPhanLoaiThuChi = 'VH14'
+			AND CTTT.MaPhanLoaiThuChi = 'VH14' 
+			AND CTTT.MaHTTT IN ('TM', 'CK', 'QT')
 			AND CTTT.NgayThuChi >= @startDate
 			AND CTTT.NgayThuChi < DATEADD(DAY, 1, @endDate)
 			AND (@siteID IS NULL OR HS.IDPhongBan = @siteID)
