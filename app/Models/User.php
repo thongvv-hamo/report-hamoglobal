@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -42,4 +43,26 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Get the role associated with the user.
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    /**
+     * Determine which site IDs the user is allowed to search.
+     * Returns an empty array if the user can access all sites (no restriction).
+     * Returns an array of site_ids if the user is site-restricted.
+     */
+    public function getAllowedSiteIds(): array
+    {
+        if (!$this->role || $this->role->role_type === Role::ROLE_ALL_SITES) {
+            return [];
+        }
+
+        return $this->role->permissions()->pluck('site_id')->toArray();
+    }
 }

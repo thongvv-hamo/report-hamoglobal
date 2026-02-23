@@ -16,6 +16,7 @@ class ReportController extends Controller
     {
         $this->reportService = $reportService;
     }
+
     public function index()
     {
         $option = [];
@@ -38,9 +39,23 @@ class ReportController extends Controller
                 $option['site_id'] = $_GET['site_id'];
             }
         }
+
+        // Apply role-based site restriction
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $allowedSiteIds = $user->getAllowedSiteIds();
+
         // dd($option);
         $data['filters'] = $option;
-        $data['sites'] = $this->reportService->getSites();
+        $sites = $this->reportService->getSites();
+        if (!empty($allowedSiteIds)) {
+            foreach ($sites as $key => $site) {
+                if (!in_array($site->IDPhongBan, $allowedSiteIds)) {
+                    unset($sites[$key]);
+                }
+            }
+        }
+        $data['sites'] = $sites;
         // dd($data);
         return view('reports.index', $data);
     }
@@ -51,10 +66,17 @@ class ReportController extends Controller
         $endDate = $request->input('end_date', now()->endOfMonth());
         $siteID = $request->input('site_id');
 
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $allowedSiteIds = $user->getAllowedSiteIds();
+        if (empty($siteID) && !empty($allowedSiteIds)) {
+            $siteID = $allowedSiteIds;
+        }
+
         $reports = $this->reportService->getReports($startDate, $endDate, $siteID);
 
         return DataTables::of($reports)
-        ->make(true);
+            ->make(true);
     }
 
     public function export(Request $request)
@@ -63,6 +85,13 @@ class ReportController extends Controller
         $startDate = $request->start_date;
         $endDate = $request->end_date;
         $siteID = $request->site_id;
+
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $allowedSiteIds = $user->getAllowedSiteIds();
+        if (empty($siteID) && !empty($allowedSiteIds)) {
+            $siteID = $allowedSiteIds;
+        }
 
         $data = $this->reportService->getReports($startDate, $endDate, $siteID);
 

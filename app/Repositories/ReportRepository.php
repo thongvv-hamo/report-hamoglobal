@@ -18,6 +18,13 @@ class ReportRepository
     {
         // Giả sử bạn dùng SQL Server
         $query = "EXEC dbo.sp_raw_reports ?, ?, ?";
+        if (is_array($siteID)) {
+            $data = [];
+            foreach ($siteID as $value) {
+                $data = array_merge($data, DB::connection('sqlsrv')->select($query, [$startDate, $endDate, $value]));
+            }
+            return $data;
+        }
 
         return DB::connection('sqlsrv')->select($query, [$startDate, $endDate, $siteID]);
     }
