@@ -4,8 +4,9 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class ReportsExport implements FromCollection, WithHeadings
+class ReportsExport implements FromCollection, WithHeadings, WithChunkReading
 {
     protected $data;
 
@@ -17,6 +18,11 @@ class ReportsExport implements FromCollection, WithHeadings
     public function collection()
     {
         return $this->data;
+    }
+
+    public function chunkSize(): int
+    {
+        return 1000;
     }
 
     public function headings(): array
