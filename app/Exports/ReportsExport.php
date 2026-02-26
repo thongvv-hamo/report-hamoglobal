@@ -2,27 +2,164 @@
 
 namespace App\Exports;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Carbon\Carbon;
 
-class ReportsExport implements FromCollection, WithHeadings, WithChunkReading
+class ReportsExport implements FromQuery, WithHeadings, WithChunkReading, WithColumnFormatting, WithMapping
 {
-    protected $data;
+    protected $startDate;
+    protected $endDate;
+    protected $siteID;
 
-    public function __construct($data)
+    public function __construct($startDate, $endDate, $siteID)
     {
-        $this->data = collect($data);
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+        $this->siteID = $siteID;
     }
 
-    public function collection()
+    public function query()
     {
-        return $this->data;
+        return DB::connection('sqlsrv')
+            ->table('view_raw_reports')
+            ->selectRaw("
+                CAST(DateOfApplication AS datetime) as DateOfApplication, 
+                SiteName,
+                Type,
+                [Order],
+                CardNumber,
+                CustomerName,
+                GroupType,
+                RevenueType,
+                ProductGroup,
+                Code,
+                Description,
+                UnitPrice,
+                Quantity,
+                Total,
+                DiscountPercent,
+                DiscountAmount,
+                PaymentAmount,
+                DeductfromAccountCard,
+                ExceptionalPayment,
+                DeductfromDeposit,
+                CashBranches,
+                PaymentGBPBranches,
+                PaymentUSDBranches,
+                PaymentAUDBranches,
+                PaymentSGDBranches,
+                PaymentJPYBranches,
+                PaymentCADbranch,
+                BranchEURPayment,
+                TransferMegaHN,
+                TransferMegaHCM,
+                TransferBIDVMedproAsia,
+                TransferSacombankMedproAsia,
+                TransferVcbMedproAsia,
+                POSMegaHN,
+                POSMegaHCM,
+                POSBIDVMedproAsia,
+                POSSacombankMedproAsia,
+                POSVcbMedproAsia,
+                Debit,
+                Ktv,
+                Nursing,
+                RevenueConsultant,
+                Doctor,
+                Nurse,
+                Cashier,
+                CustomerServiceStaff,
+                CustomerType,
+                Note")
+            ->whereBetween('DateOfApplication', [$this->startDate, $this->endDate])
+            ->when($this->siteID, function ($q) {
+                if (is_array($this->siteID)) {
+                    $q->whereIn('site_id', $this->siteID);
+                } else {
+                    $q->where('site_id', $this->siteID);
+                }
+            })
+            ->orderBy('DateOfApplication')
+            ->orderBy('Type')
+            ->orderBy('Order')
+            ->orderByDesc('SortKey');
     }
 
     public function chunkSize(): int
     {
         return 1000;
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'A' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+        ];
+    }
+
+    public function map($row): array
+    {
+        return [
+            // 👇 convert sang Excel serial date
+            Date::dateTimeToExcel(
+                Carbon::parse($row->DateOfApplication)
+            ),
+
+            $row->SiteName,
+            $row->Type,
+            $row->Order,
+            $row->CardNumber,
+            $row->CustomerName,
+            $row->GroupType,
+            $row->RevenueType,
+            $row->ProductGroup,
+            $row->Code,
+            $row->Description,
+            $row->UnitPrice,
+            $row->Quantity,
+            $row->Total,
+            $row->DiscountPercent,
+            $row->DiscountAmount,
+            $row->PaymentAmount,
+            $row->DeductfromAccountCard,
+            $row->ExceptionalPayment,
+            $row->DeductfromDeposit,
+            $row->CashBranches,
+            $row->PaymentGBPBranches,
+            $row->PaymentUSDBranches,
+            $row->PaymentAUDBranches,
+            $row->PaymentSGDBranches,
+            $row->PaymentJPYBranches,
+            $row->PaymentCADbranch,
+            $row->BranchEURPayment,
+            $row->TransferMegaHN,
+            $row->TransferMegaHCM,
+            $row->TransferBIDVMedproAsia,
+            $row->TransferSacombankMedproAsia,
+            $row->TransferVcbMedproAsia,
+            $row->POSMegaHN,
+            $row->POSMegaHCM,
+            $row->POSBIDVMedproAsia,
+            $row->POSSacombankMedproAsia,
+            $row->POSVcbMedproAsia,
+            $row->Debit,
+            $row->Ktv,
+            $row->Nursing,
+            $row->RevenueConsultant,
+            $row->Doctor,
+            $row->Nurse,
+            $row->Cashier,
+            $row->CustomerServiceStaff,
+            $row->CustomerType,
+            $row->Note,
+        ];
     }
 
     public function headings(): array

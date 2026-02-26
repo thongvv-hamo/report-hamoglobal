@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use App\Services\ReportService;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -93,9 +94,9 @@ class ReportController extends Controller
             $siteID = $allowedSiteIds;
         }
 
-        $data = $this->reportService->getReports($startDate, $endDate, $siteID);
+        // $data = $this->reportService->getReports($startDate, $endDate, $siteID);
 
         // Xuất bằng maatwebsite/excel
-        return Excel::download(new \App\Exports\ReportsExport($data), 'BaoCao.xlsx');
+        return Excel::download(new \App\Exports\ReportsExport($startDate, $endDate, $siteID), 'BaoCao.xlsx');
     }
 }
