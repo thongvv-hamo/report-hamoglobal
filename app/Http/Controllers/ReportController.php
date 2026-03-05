@@ -77,6 +77,9 @@ class ReportController extends Controller
         $reports = $this->reportService->getReports($startDate, $endDate, $siteID);
 
         return DataTables::of($reports)
+            ->editColumn('DateOfApplication', function ($report) {
+                return Carbon::parse($report->DateOfApplication)->format('d/m/Y');
+            })
             ->make(true);
     }
 

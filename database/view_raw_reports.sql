@@ -12,7 +12,7 @@
  Target Server Version : 14001000 (14.00.1000)
  File Encoding         : 65001
 
- Date: 05/03/2026 17:15:49
+ Date: 05/03/2026 17:18:52
 */
 
 
@@ -134,7 +134,8 @@ Tmp_datcoc AS
 		T.[CustomerServiceStaff],
 		T.[CustomerType],
 		T.[Note],
-		T.[SortKey]
+		T.[SortKey],
+		T.[SortPriority]
 	 FROM
 
 	(SELECT -- dịch vụ đã mua chưa sử dụng
@@ -212,7 +213,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
@@ -347,7 +349,8 @@ Tmp_datcoc AS
 		'' AS 'Cashier',
 		HS.CuMoi AS 'CustomerType',
 		LTDT.GhiChu AS 'Note',
-		'' AS SortKey 
+		'' AS SortKey,
+		1 AS SortPriority 
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
@@ -513,7 +516,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
@@ -681,7 +685,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
@@ -757,6 +762,150 @@ Tmp_datcoc AS
 		HS.GhiChu
 
 	UNION ALL 
+	
+	SELECT -- Dịch vụ con trong cấu hình Combo/gói đã mua chưa sử dụng
+		 CAST(CTTT.NgayThanhToan AS DATE) AS 'DateOfApplication',
+		 DMPB.IDPhongBan AS 'site_id',
+		 DMPB.TenPhongBan AS 'SiteName',
+		CASE
+			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
+					 THEN N'Thanh toán công nợ'
+			ELSE N'Mua'
+		END AS 'Type',
+		CASE
+	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
+					 THEN 'PAID_' + HS.MaHoSo
+			ELSE HS.MaHoSo
+		END AS 'Order',
+		DMKH.MaKHQuanLy AS 'CardNumber',
+		DMKH.HoTen AS 'CustomerName',
+		'' AS 'GroupType',
+		DMGoi.TenComboGoiDVSP AS 'RevenueType',
+		DMGoi.TenComboGoiDVSP AS 'ProductGroup',
+		DMDV.MaDichVu AS 'Code',
+		DMDV.TenDichVu AS 'Description',
+		DMGoiCT.DonGia AS 'UnitPrice',
+		DMGoiCT.SoLuong AS 'Quantity',
+		CASE
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
+				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
+			ELSE CTGoi.ThanhTien END AS 'Total',
+		CTGoi.GiamGia AS 'DiscountPercent',
+		CTGoi.ThanhTienGiamGia AS 'DiscountAmount',
+		CASE
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
+				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
+			ELSE CTGoi.TienThanhToan END AS 'PaymentAmount',
+		'' AS 'DeductfromAccountCard',
+		'' AS  'ExceptionalPayment',
+		SUM(CASE WHEN CTTT.MaHTTT = 'TRUCOC' THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'DeductfromDeposit',
+		SUM(CASE WHEN CTTT.MaHTTT = 'TM' AND CTTT.ThanhTienThanhToan > 0 AND (TTCT.USD_sotien IS NULL OR TTCT.USD_sotien = 0 OR TTCT.USD_sotien = '') THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'CashBranches',
+		'' AS 'PaymentGBPBranches',
+		SUM(CASE WHEN CTTT.MaHTTT = 'TM' AND CTTT.ThanhTienThanhToan > 0 AND TTCT.USD_sotien > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'PaymentUSDBranches',
+		'' AS 'PaymentAUDBranches',
+		'' AS 'PaymentSGDBranches',
+		'' AS 'PaymentJPYBranches',
+		'' AS 'PaymentCADbranch',
+		'' AS 'BranchEURPayment',
+		SUM(CASE WHEN CTTT.MaHTTT = 'CK' AND DMNH.IDNganHang = 111 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'TransferMegaHN',
+		SUM(CASE WHEN CTTT.MaHTTT = 'CK' AND DMNH.IDNganHang = 113 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'TransferMegaHCM',
+		SUM(CASE WHEN CTTT.MaHTTT = 'CK' AND DMNH.IDNganHang = 114 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'TransferBIDVMedproAsia',
+		SUM(CASE WHEN CTTT.MaHTTT = 'CK' AND DMNH.IDNganHang = 129 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'TransferSacombankMedproAsia',
+		SUM(CASE WHEN CTTT.MaHTTT = 'CK' AND DMNH.IDNganHang = 130 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'TransferVcbMedproAsia',
+		SUM(CASE WHEN CTTT.MaHTTT = 'QT' AND DMNH.IDNganHang = 111 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'POSMegaHN',
+		SUM(CASE WHEN CTTT.MaHTTT = 'QT' AND DMNH.IDNganHang = 113 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'POSMegaHCM',
+		SUM(CASE WHEN CTTT.MaHTTT = 'QT' AND DMNH.IDNganHang = 114 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'POSBIDVMedproAsia',
+		SUM(CASE WHEN CTTT.MaHTTT = 'QT' AND DMNH.IDNganHang = 129 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'POSSacombankMedproAsia',
+		SUM(CASE WHEN CTTT.MaHTTT = 'QT' AND DMNH.IDNganHang = 130 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'POSVcbMedproAsia',
+		SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'Debit',
+		'' AS 'Ktv',
+		'' AS 'Nursing',
+		MAX(ListTuVanVien.TenTuVanVien) AS 'RevenueConsultant',
+		'' AS 'Doctor',
+		'' AS 'Nurse',
+		ThuNgan.Screenname AS 'Cashier',
+		CSKH.TenNhanVien AS 'CustomerServiceStaff',
+		HS.CuMoi AS 'CustomerType',
+		HS.GhiChu AS 'Note',
+		MIN(CTTT.MaHTTT) AS SortKey,
+		2 AS SortPriority
+	FROM
+		HoSoKhachHang HS
+		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
+		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.HoSoID=HS.IDHoSo
+		INNER JOIN HoSoKhachHangComBoGoiDVSP_ChiTietThanhToan CTTT ON CTTT.IDHoSoComBoGoiDVSP = CTGoi.IDHoSoComBoGoiDVSP
+		INNER JOIN DmComboGoiDichVuSanPham DMGoi ON DMGoi.IDComboGoiDVSP = CTGoi.IDComboGoiDVSP
+		INNER JOIN DmComboGoiDichVuSanPhamChiTiet DMGoiCT ON DMGoiCT.IDComboGoiDVSP = DMGoi.IDComboGoiDVSP AND DMGoiCT.Loai = 1 -- Dịch vụ
+		INNER JOIN DmDichVu DMDV ON DMDV.IDDichVu = DMGoiCT.IDDichVuSanPham
+		LEFT JOIN HoSoKhachHangComBoGoiDVSP_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoComBoGoiDVSP = CTGoi.IDHoSoComBoGoiDVSP AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
+		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
+		LEFT JOIN PhieuThanhToanChiTiet_NganHang TTNH ON TTNH.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
+		OUTER APPLY (
+			SELECT 
+					STRING_AGG(NVX.DisplayName, ',') AS TenTuVanVien
+			FROM (
+					SELECT 
+							NV.IDNhanVien,
+							NHOM.NhomNhanVien + ' ' + NV.TenNhanVien 
+							+ N'(' + 
+									CASE 
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
+													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / 100 AS DECIMAL(18,0)), 'N0')
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
+													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / cb.TongTienThanhToan AS DECIMAL(18,0)), 'N0')
+											ELSE N'0'
+									END 
+							+ N')' AS DisplayName
+					FROM HoSoKhachHangChiTietDichVuSPThe_HoaHongNVTuVan HH
+					INNER JOIN DmNhanVien NV 
+							ON HH.IDNhanVien = NV.IDNhanVien
+					INNER JOIN DmNhomNhanVien NHOM 
+							ON NV.IDNhomNhanVien = NHOM.IDNhomNhanVien
+					CROSS APPLY (
+							SELECT CAST
+								(SUM(TmpGoi_TongTienThanhToan.TienThanhToan) AS DECIMAL (18, 0)) AS CTGoi_TienThanhToan
+							FROM
+								TmpGoi_TongTienThanhToan
+							WHERE
+								TmpGoi_TongTienThanhToan.IDHoSoDichVuSanPhamThe = CTGoi.IDHoSoComBoGoiDVSP
+								AND TmpGoi_TongTienThanhToan.NgayThanhToan =  CAST(CTTT.NgayThanhToan AS DATE)
+					) AS ca
+					CROSS APPLY (SELECT CAST(CTGoi.TienThanhToan AS DECIMAL(18,0)) AS TongTienThanhToan) AS cb
+					WHERE HH.HoSoID = HS.IDHoSo 
+							AND HH.IDDichVuSanPhamThe=CTGoi.IDComboGoiDVSP
+					GROUP BY NV.IDNhanVien, NHOM.NhomNhanVien, NV.TenNhanVien, CTGoi_TienThanhToan, TongTienThanhToan
+			) NVX
+		) ListTuVanVien
+		LEFT JOIN PQ_User ThuNgan ON ThuNgan.Id=HS.NguoiDungID
+		LEFT JOIN DmNhanVien CSKH ON CSKH.IDNhanVien=HS.IDNhanVienChamSoc
+		LEFT JOIN DmNganHang DMNH ON DMNH.IDNganHang = TTNH.IDNganHang AND DMNH.IDNganHang IN (111, 113, 114, 129, 130)
+		LEFT JOIN DMPhongBanOFChiNhanh DMPB ON DMPB.IDPhongBan = HS.IDPhongBan
+		WHERE HS.MaHoSo NOT LIKE '%_HH0%'
+	GROUP BY
+		CAST(CTTT.NgayThanhToan AS DATE),
+		DMPB.IDPhongBan,
+		DMPB.TenPhongBan,
+		HS.MaHoSo,
+		DMKH.MaKHQuanLy,
+		DMKH.HoTen,
+		DMGoi.TenComboGoiDVSP,
+		DMDV.MaDichVu,
+		DMDV.TenDichVu,
+		DMGoiCT.DonGia,
+		DMGoiCT.SoLuong,
+		CTGoi.ThanhTien,
+		CTGoi.GiamGia,
+		CTGoi.ThanhTienGiamGia,
+		CTGoi.TienThanhToan,
+		ListTuVanVien.TenTuVanVien,
+		ThuNgan.Screenname,
+		CSKH.TenNhanVien,
+		HS.CuMoi,
+		HS.GhiChu
+	
+	UNION ALL 
 
 	SELECT -- Combo/gói dịch vụ sản phẩm đã sử dụng
 		 CAST(LTDT.NgayThucHien AS DATE) AS 'DateOfApplication',
@@ -811,7 +960,8 @@ Tmp_datcoc AS
 		'' AS 'Cashier',
 		HS.CuMoi AS 'CustomerType',
 		LTDT.GhiChu AS 'Note',
-		'' AS SortKey 
+		'' AS SortKey,
+		1 AS SortPriority 
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
@@ -964,7 +1114,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
@@ -1042,6 +1193,146 @@ Tmp_datcoc AS
 			HS.GhiChu
 		
 	UNION ALL
+	
+	SELECT -- Dịch vụ con trong cấu hình Thẻ dịch vụ chưa sử dụng
+		 CAST(CTTT.NgayThanhToan AS DATE) AS 'DateOfApplication',
+		 DMPB.IDPhongBan AS 'site_id',
+		 DMPB.TenPhongBan AS 'SiteName',
+		CASE
+			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+					 THEN N'Thanh toán công nợ'
+			ELSE N'Mua'
+		END AS 'Type',
+		CASE
+	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
+			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
+					 THEN 'PAID_' + HS.MaHoSo
+			ELSE HS.MaHoSo
+		END AS 'Order',
+		DMKH.MaKHQuanLy AS 'CardNumber',
+		DMKH.HoTen AS 'CustomerName',
+		'' AS 'GroupType',
+		DMLT.TenLoaiTheDichVu AS 'RevenueType',
+		DMLT.TenLoaiTheDichVu AS 'ProductGroup',
+		DMDV.MaDichVu AS 'Code',
+		CHT.TenCauHinhThe AS 'Description',
+		CHT.DonGia AS 'UnitPrice',
+		CHT.SoLan AS 'Quantity',
+		CHT.DonGia AS 'Total',
+		CTTDV.GiamGia AS 'DiscountPercent',
+		CTTDV.ThanhTienGiamGia AS 'DiscountAmount',
+		CHT.DonGia AS 'PaymentAmount',
+		'' AS 'DeductfromAccountCard',
+		'' AS  'ExceptionalPayment',
+		0 AS 'DeductfromDeposit',
+		0 AS 'CashBranches',
+		'' AS 'PaymentGBPBranches',
+		0 AS 'PaymentUSDBranches',
+		'' AS 'PaymentAUDBranches',
+		'' AS 'PaymentSGDBranches',
+		'' AS 'PaymentJPYBranches',
+		'' AS 'PaymentCADbranch',
+		'' AS 'BranchEURPayment',
+		0 AS 'TransferMegaHN',
+		0 AS 'TransferMegaHCM',
+		0 AS 'TransferBIDVMedproAsia',
+		0 AS 'TransferSacombankMedproAsia',
+		0 AS 'TransferVcbMedproAsia',
+		0 AS 'POSMegaHN',
+		0 AS 'POSMegaHCM',
+		0 AS 'POSBIDVMedproAsia',
+		0 AS 'POSSacombankMedproAsia',
+		0 AS 'POSVcbMedproAsia',
+		0 AS 'Debit',
+		'' AS 'Ktv',
+		'' AS 'Nursing',
+		MAX(ListTuVanVien.TenTuVanVien) AS 'RevenueConsultant',
+		'' AS 'Doctor',
+		'' AS 'Nurse',
+		ThuNgan.Screenname AS 'Cashier',
+		CSKH.TenNhanVien AS 'CustomerServiceStaff',
+		HS.CuMoi AS 'CustomerType',
+		HS.GhiChu AS 'Note',
+		MIN(CTTT.MaHTTT) AS SortKey,
+		2 AS SortPriority
+	FROM
+		HoSoKhachHang HS
+		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
+		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.HoSoID=HS.IDHoSo
+		INNER JOIN TheDichVu_CauHinhThe CHT ON CHT.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
+		INNER JOIN TheDichVu_CauHinhTheDichVuChitiet CHTCT ON CHTCT.IDCauHinhThe = CHT.ID
+		INNER JOIN HoSoKhachHangChiTietTheDichVu_ChiTietThanhToan CTTT ON CTTT.IDHoSoTheDVTV = CTTDV.IDHoSoTheDVTV
+		INNER JOIN DmDichVu DMDV ON DMDV.IDDichVu = CHTCT.IDDichVu
+		LEFT JOIN TheDichVu_CauHinhThe_KhachHang CHTKH ON CHTKH.IDHoSo = HS.IDHoSo AND CHTKH.IDCauHinhThe = CHTCT.IDCauHinhThe
+		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
+		LEFT JOIN PhieuThanhToanChiTiet_NganHang TTNH ON TTNH.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
+		LEFT JOIN TheDichVu DMTDV ON DMTDV.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
+		LEFT JOIN DmLoaiTheDichVu DMLT ON DMLT.IDLoaiTheDichVu = DMTDV.IDLoaiTheDichVu
+		OUTER APPLY (		
+			SELECT 
+					STRING_AGG(NVX.DisplayName, ',') AS TenTuVanVien
+			FROM (
+					SELECT 
+							NV.IDNhanVien,
+							NHOM.NhomNhanVien + ' ' + NV.TenNhanVien 
+							+ N'(' + 
+									CASE 
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
+												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / 100 AS DECIMAL(18,0)), 'N0')
+											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
+												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / cb.TongTienThanhToan AS DECIMAL(18,0)), 'N0')
+											ELSE N'0'
+									END 
+							+ N')' AS DisplayName
+					FROM HoSoKhachHangChiTietDichVuSPThe_HoaHongNVTuVan HH
+					INNER JOIN DmNhanVien NV 
+							ON HH.IDNhanVien = NV.IDNhanVien
+					INNER JOIN DmNhomNhanVien NHOM 
+							ON NV.IDNhomNhanVien = NHOM.IDNhomNhanVien
+					CROSS APPLY (
+							SELECT CAST
+								(SUM(TmpTDV_TongTienThanhToan.TienThanhToan) AS DECIMAL (18, 0)) AS CTTDV_TienThanhToan
+							FROM
+								TmpTDV_TongTienThanhToan
+							WHERE
+								TmpTDV_TongTienThanhToan.IDHoSoDichVuSanPhamThe = CTTDV.IDHoSoTheDVTV
+								AND TmpTDV_TongTienThanhToan.NgayThanhToan = CAST(CTTT.NgayThanhToan AS DATE)
+					) AS ca
+					CROSS APPLY (SELECT CAST(CTTDV.TienThanhToan AS DECIMAL(18,0)) AS TongTienThanhToan) AS cb
+					WHERE HH.HoSoID = HS.IDHoSo 
+							AND HH.IDDichVuSanPhamThe = DMTDV.IDTheDichVu
+					GROUP BY NV.IDNhanVien, NHOM.NhomNhanVien, NV.TenNhanVien, ca.CTTDV_TienThanhToan, TongTienThanhToan
+			) NVX
+		) ListTuVanVien
+		LEFT JOIN PQ_User ThuNgan ON ThuNgan.Id=HS.NguoiDungID
+		LEFT JOIN DmNhanVien CSKH ON CSKH.IDNhanVien=HS.IDNhanVienChamSoc
+		LEFT JOIN DmNganHang DMNH ON DMNH.IDNganHang = TTNH.IDNganHang AND DMNH.IDNganHang IN (111, 113, 114, 129, 130)
+		LEFT JOIN DMPhongBanOFChiNhanh DMPB ON DMPB.IDPhongBan = HS.IDPhongBan
+		WHERE HS.MaHoSo NOT LIKE '%_HH0%'
+	GROUP BY
+			CAST(CTTT.NgayThanhToan AS DATE),
+			DMPB.IDPhongBan,
+			DMPB.TenPhongBan,
+			HS.MaHoSo,
+			DMKH.MaKHQuanLy,
+			DMKH.HoTen,
+			DMLT.TenLoaiTheDichVu,
+			DMDV.MaDichVu,
+			CHT.TenCauHinhThe,
+			CHT.DonGia,
+			CHT.SoLan,
+			CTTDV.ThanhTien,
+			CTTDV.GiamGia,
+			CTTDV.ThanhTienGiamGia,
+			CTTDV.TienThanhToan,
+			ListTuVanVien.TenTuVanVien,
+			ThuNgan.Screenname,
+			CSKH.TenNhanVien,
+			HS.CuMoi,
+			HS.GhiChu
+	
+	UNION ALL
 
 	SELECT -- Dịch vụ trong cấu hình thẻ đã sử dụng
 		 CAST(LTDT.NgayThucHien AS DATE) AS 'DateOfApplication',
@@ -1096,7 +1387,8 @@ Tmp_datcoc AS
 		'' AS 'Cashier',
 		HS.CuMoi AS 'CustomerType',
 		LTDT.GhiChu AS 'Note',
-		'' AS SortKey 
+		'' AS SortKey,
+		1 AS SortPriority 
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN DmKhachHang DMKH ON DMKH.MaKhachHang = HS.MaKhachHang
@@ -1226,7 +1518,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
@@ -1347,7 +1640,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
@@ -1468,7 +1762,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
@@ -1586,7 +1881,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.MaHoSo = LEFT(HS.MaHoSo, LEN(HS.MaHoSo) - CHARINDEX('_', REVERSE(HS.MaHoSo)))
@@ -1707,7 +2003,8 @@ Tmp_datcoc AS
 		CSKH.TenNhanVien AS 'CustomerServiceStaff',
 		HS.CuMoi AS 'CustomerType',
 		HS.GhiChu AS 'Note',
-		MIN(CTTT.MaHTTT) AS SortKey
+		MIN(CTTT.MaHTTT) AS SortKey,
+		1 AS SortPriority
 	FROM
 		HoSoKhachHang HS
 		INNER JOIN HoSoKhachHang HSGoc ON HSGoc.IDHoSo = HS.IDHoSoGoc

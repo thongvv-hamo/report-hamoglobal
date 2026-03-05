@@ -89,7 +89,8 @@ class ReportsExport implements FromQuery, WithHeadings, WithChunkReading, WithCo
             ->orderBy('DateOfApplication')
             ->orderBy('Type')
             ->orderBy('Order')
-            ->orderByDesc('SortKey');
+            ->orderByDesc('SortKey')
+            ->orderBy('SortPriority');
     }
 
     public function chunkSize(): int
