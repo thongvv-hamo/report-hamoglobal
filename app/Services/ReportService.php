@@ -17,13 +17,13 @@ class ReportService
     /**
      * Xử lý và trả về dữ liệu báo cáo.
      */
-    public function getReports($startDate, $endDate, $siteID = null)
+    public function getReports($startDate, $endDate, $siteID = null, $type = null)
     {
         // Chuẩn hóa định dạng ngày
         $startDate = Carbon::parse($startDate)->format('Y-m-d');
         $endDate = Carbon::parse($endDate)->format('Y-m-d');
 
-        return $this->reportRepository->getReports($startDate, $endDate, $siteID);
+        return $this->reportRepository->getReports($startDate, $endDate, $siteID, $type);
     }
 
     /**

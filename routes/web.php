@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportTestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,8 +33,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::post('/reports/data', [ReportController::class, 'getData'])->name('reports.data');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
+
+    Route::prefix('test')->name('test.')->middleware('role.all_sites')->group(function () {
+        Route::get('/reports', [ReportTestController::class, 'index'])->name('reports.index');
+        Route::post('/reports/data', [ReportTestController::class, 'getData'])->name('reports.data');
+        Route::get('/reports/export', [ReportTestController::class, 'export'])->name('reports.export');
+    });
 });
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

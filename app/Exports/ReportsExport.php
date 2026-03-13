@@ -17,18 +17,21 @@ class ReportsExport implements FromQuery, WithHeadings, WithChunkReading, WithCo
     protected $startDate;
     protected $endDate;
     protected $siteID;
+    protected $type;
 
-    public function __construct($startDate, $endDate, $siteID)
+    public function __construct($startDate, $endDate, $siteID, $type)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->siteID = $siteID;
+        $this->type = $type;
     }
 
     public function query()
     {
+        $table = $this->type == 'test' ? 'view_raw_reports_test' : 'view_raw_reports';
         return DB::connection('sqlsrv')
-            ->table('view_raw_reports')
+            ->table($table)
             ->selectRaw("
                 CAST(DateOfApplication AS datetime) as DateOfApplication, 
                 SiteName,

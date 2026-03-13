@@ -12,9 +12,10 @@ class ReportRepository
      * @param string $startDate
      * @param string $endDate
      * @param int|null $siteID
+     * @param string|null $type
      * @return array
      */
-    public function getReports($startDate, $endDate, $siteID = null)
+    public function getReports($startDate, $endDate, $siteID = null, $type = null)
     {
         // $query = "EXEC dbo.sp_raw_reports ?, ?, ?";
         // if (is_array($siteID)) {
@@ -26,9 +27,10 @@ class ReportRepository
         // }
 
         // return DB::connection('sqlsrv')->select($query, [$startDate, $endDate, $siteID]);
+        $table = $type == 'test' ? 'view_raw_reports_test' : 'view_raw_reports';
 
         return DB::connection('sqlsrv')
-            ->table('view_raw_reports')
+            ->table($table)
             ->selectRaw("
                 CAST(DateOfApplication AS datetime) as DateOfApplication, 
                 SiteName,

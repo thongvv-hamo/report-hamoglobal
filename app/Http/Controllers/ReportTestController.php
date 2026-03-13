@@ -9,7 +9,7 @@ use App\Services\ReportService;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 
-class ReportController extends Controller
+class ReportTestController extends Controller
 {
     protected $reportService;
 
@@ -58,7 +58,7 @@ class ReportController extends Controller
         }
         $data['sites'] = $sites;
         // dd($data);
-        return view('reports.index', $data);
+        return view('reports.test', $data);
     }
 
     public function getData(Request $request)
@@ -74,7 +74,7 @@ class ReportController extends Controller
             $siteID = $allowedSiteIds;
         }
 
-        $reports = $this->reportService->getReports($startDate, $endDate, $siteID);
+        $reports = $this->reportService->getReports($startDate, $endDate, $siteID, 'test');
 
         return DataTables::of($reports)
             ->editColumn('DateOfApplication', function ($report) {
@@ -100,6 +100,6 @@ class ReportController extends Controller
         // $data = $this->reportService->getReports($startDate, $endDate, $siteID);
 
         // Xuất bằng maatwebsite/excel
-        return Excel::download(new \App\Exports\ReportsExport($startDate, $endDate, $siteID, null), 'BaoCao.xlsx');
+        return Excel::download(new \App\Exports\ReportsExport($startDate, $endDate, $siteID, 'test'), 'BaoCao.xlsx');
     }
 }
