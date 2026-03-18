@@ -12,7 +12,7 @@
  Target Server Version : 14001000 (14.00.1000)
  File Encoding         : 65001
 
- Date: 05/03/2026 17:18:52
+ Date: 18/03/2026 09:03:24
 */
 
 
@@ -82,7 +82,87 @@ TmpTDV_TongTienThanhToan AS
 Tmp_datcoc AS
 	(SELECT ID 
 	FROM DmSanPham 
-	WHERE MaSanPham LIKE '%DATCOC%')
+	WHERE MaSanPham LIKE '%DATCOC%'),
+	
+-- Dịch vụ - Thanh toán công nợ	
+CTDV_ThanhToanCongNo AS (
+		SELECT CAST(CTTT.NgayThanhToan AS DATE) AS DateOfApplication,
+			CTTT.HoSoID,
+			CTTT.IDHoSoDichVu,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID,
+			SUM(CTTT.ThanhTienThanhToan) AS ThanhTienThanhToan
+		FROM HoSoKhachHangChiTietDichVu_ChiTietThanhToan CTTT
+		GROUP BY 
+			CAST(CTTT.NgayThanhToan AS DATE),
+			CTTT.HoSoID,
+			CTTT.IDHoSoDichVu,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID
+		HAVING 
+			MaHTTT='CN' 
+			AND SUM(CTTT.ThanhTienThanhToan) < 0
+),
+	
+-- Sản phẩm - Thanh toán công nợ	
+CTSP_ThanhToanCongNo AS (
+		SELECT CAST(CTTT.NgayThanhToan AS DATE) AS DateOfApplication,
+			CTTT.HoSoID,
+			CTTT.IDHoSoSanPham,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID,
+			SUM(CTTT.ThanhTienThanhToan) AS ThanhTienThanhToan
+		FROM HoSoKhachHangChiTietSanPham_ChiTietThanhToan CTTT
+		GROUP BY 
+			CAST(CTTT.NgayThanhToan AS DATE),
+			CTTT.HoSoID,
+			CTTT.IDHoSoSanPham,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID
+		HAVING 
+			MaHTTT='CN' 
+			AND SUM(CTTT.ThanhTienThanhToan) < 0
+),
+	
+-- Gói - Thanh toán công nợ	
+CTGoi_ThanhToanCongNo AS (
+		SELECT CAST(CTTT.NgayThanhToan AS DATE) AS DateOfApplication,
+			CTTT.HoSoID,
+			CTTT.IDHoSoComBoGoiDVSP,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID,
+			SUM(CTTT.ThanhTienThanhToan) AS ThanhTienThanhToan
+		FROM HoSoKhachHangComBoGoiDVSP_ChiTietThanhToan CTTT
+		GROUP BY 
+			CAST(CTTT.NgayThanhToan AS DATE),
+			CTTT.HoSoID,
+			CTTT.IDHoSoComBoGoiDVSP,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID
+		HAVING 
+			MaHTTT='CN' 
+			AND SUM(CTTT.ThanhTienThanhToan) < 0
+),
+	
+-- Thẻ dịch vụ - Thanh toán công nợ	
+CTTDV_ThanhToanCongNo AS (
+		SELECT CAST(CTTT.NgayThanhToan AS DATE) AS DateOfApplication,
+			CTTT.HoSoID,
+			CTTT.IDHoSoTheDVTV,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID,
+			SUM(CTTT.ThanhTienThanhToan) AS ThanhTienThanhToan
+		FROM HoSoKhachHangChiTietTheDichVu_ChiTietThanhToan CTTT
+		GROUP BY 
+			CAST(CTTT.NgayThanhToan AS DATE),
+			CTTT.HoSoID,
+			CTTT.IDHoSoTheDVTV,
+			CTTT.MaHTTT,
+			CTTT.PhieuThanhToanID
+		HAVING 
+			MaHTTT='CN' 
+			AND SUM(CTTT.ThanhTienThanhToan) < 0
+)
 
 	SELECT 
 		T.[DateOfApplication],
@@ -221,6 +301,7 @@ Tmp_datcoc AS
 		INNER JOIN HoSoKhachHangChiTietDichVu CTDV ON CTDV.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangChiTietDichVu_ChiTietThanhToan CTTT ON CTTT.IDHoSoDichVu = CTDV.IDHoSoDichVu
 		LEFT JOIN HoSoKhachHangChiTietDichVu_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan <= 0 AND HSCN.IDHoSoDichVu = CTDV.IDHoSoDichVu AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan >= 0
+		LEFT JOIN CTDV_ThanhToanCongNo TTCN ON TTCN.IDHoSoDichVu = CTDV.IDHoSoDichVu AND TTCN.PhieuThanhToanID = CTTT.PhieuThanhToanID AND TTCN.DateOfApplication = CAST(CTTT.NgayThanhToan AS DATE)
 		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
 		LEFT JOIN PhieuThanhToanChiTiet_NganHang TTNH ON TTNH.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
 		OUTER APPLY (
@@ -279,6 +360,7 @@ Tmp_datcoc AS
 			DMPB.IDPhongBan,
 			DMPB.TenPhongBan,
 			HS.MaHoSo,
+			TTCN.HoSoID,
 			DMKH.MaKHQuanLy,
 			DMKH.HoTen,
 			DMNDV.MaNhomDichVu,
@@ -524,6 +606,7 @@ Tmp_datcoc AS
 		INNER JOIN HoSoKhachHangChiTietSanPham CTSP ON CTSP.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangChiTietSanPham_ChiTietThanhToan CTTT ON CTTT.IDHoSoSanPham = CTSP.IDHoSoSanPham
 		LEFT JOIN HoSoKhachHangChiTietSanPham_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoSanPham = CTSP.IDHoSoSanPham AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
+		LEFT JOIN CTSP_ThanhToanCongNo TTCN ON TTCN.IDHoSoSanPham = CTSP.IDHoSoSanPham AND TTCN.PhieuThanhToanID = CTTT.PhieuThanhToanID AND TTCN.DateOfApplication = CAST(CTTT.NgayThanhToan AS DATE)
 		JOIN DmSanPham DMSP ON DMSP.ID = CTSP.SanPhamID
 		JOIN DmNhomSanPham DMNSP ON DMNSP.ID = DMSP.NhomSanPhamID
 		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
@@ -581,6 +664,7 @@ Tmp_datcoc AS
 			DMPB.IDPhongBan,
 			DMPB.TenPhongBan,
 			HS.MaHoSo,
+			TTCN.HoSoID,
 			DMKH.MaKHQuanLy,
 			DMKH.HoTen,
 			DMNSP.MaNhomSanPham,
@@ -693,6 +777,7 @@ Tmp_datcoc AS
 		INNER JOIN HoSoKhachHangComBoGoiDVSP CTGoi ON CTGoi.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangComBoGoiDVSP_ChiTietThanhToan CTTT ON CTTT.IDHoSoComBoGoiDVSP = CTGoi.IDHoSoComBoGoiDVSP
 		LEFT JOIN HoSoKhachHangComBoGoiDVSP_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoComBoGoiDVSP = CTGoi.IDHoSoComBoGoiDVSP AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
+		LEFT JOIN CTGoi_ThanhToanCongNo TTCN ON TTCN.IDHoSoComBoGoiDVSP = CTGoi.IDHoSoComBoGoiDVSP AND TTCN.PhieuThanhToanID = CTTT.PhieuThanhToanID AND TTCN.DateOfApplication = CAST(CTTT.NgayThanhToan AS DATE)
 		LEFT JOIN DmComboGoiDichVuSanPham DMGoi ON DMGoi.IDComboGoiDVSP = CTGoi.IDComboGoiDVSP
 		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
 		LEFT JOIN PhieuThanhToanChiTiet_NganHang TTNH ON TTNH.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
@@ -745,6 +830,7 @@ Tmp_datcoc AS
 		DMPB.IDPhongBan,
 		DMPB.TenPhongBan,
 		HS.MaHoSo,
+		TTCN.HoSoID,
 		DMKH.MaKHQuanLy,
 		DMKH.HoTen,
 		DMGoi.TenComboGoiDVSP,
@@ -767,18 +853,8 @@ Tmp_datcoc AS
 		 CAST(CTTT.NgayThanhToan AS DATE) AS 'DateOfApplication',
 		 DMPB.IDPhongBan AS 'site_id',
 		 DMPB.TenPhongBan AS 'SiteName',
-		CASE
-			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
-					 THEN N'Thanh toán công nợ'
-			ELSE N'Mua'
-		END AS 'Type',
-		CASE
-	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
-					 THEN 'PAID_' + HS.MaHoSo
-			ELSE HS.MaHoSo
-		END AS 'Order',
+		 N'Mua' AS 'Type',
+		 HS.MaHoSo AS 'Order',
 		DMKH.MaKHQuanLy AS 'CardNumber',
 		DMKH.HoTen AS 'CustomerName',
 		'' AS 'GroupType',
@@ -788,16 +864,10 @@ Tmp_datcoc AS
 		DMDV.TenDichVu AS 'Description',
 		DMGoiCT.DonGia AS 'UnitPrice',
 		DMGoiCT.SoLuong AS 'Quantity',
-		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
-				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
-			ELSE CTGoi.ThanhTien END AS 'Total',
+		CTGoi.ThanhTien AS 'Total',
 		CTGoi.GiamGia AS 'DiscountPercent',
 		CTGoi.ThanhTienGiamGia AS 'DiscountAmount',
-		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) 
-				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
-			ELSE CTGoi.TienThanhToan END AS 'PaymentAmount',
+		CTGoi.TienThanhToan AS 'PaymentAmount',
 		'' AS 'DeductfromAccountCard',
 		'' AS  'ExceptionalPayment',
 		SUM(CASE WHEN CTTT.MaHTTT = 'TRUCOC' THEN CTTT.ThanhTienThanhToan ELSE 0 END) AS 'DeductfromDeposit',
@@ -1122,6 +1192,7 @@ Tmp_datcoc AS
 		INNER JOIN HoSoKhachHangChiTietTheDichVu CTTDV ON CTTDV.HoSoID=HS.IDHoSo
 		INNER JOIN HoSoKhachHangChiTietTheDichVu_ChiTietThanhToan CTTT ON CTTT.IDHoSoTheDVTV = CTTDV.IDHoSoTheDVTV
 		LEFT JOIN HoSoKhachHangChiTietTheDichVu_ChiTietThanhToan HSCN ON CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 AND HSCN.IDHoSoTheDVTV = CTTDV.IDHoSoTheDVTV AND HSCN.MaHTTT = 'CN' AND HSCN.ThanhTienThanhToan > 0
+		LEFT JOIN CTTDV_ThanhToanCongNo TTCN ON TTCN.IDHoSoTheDVTV = CTTDV.IDHoSoTheDVTV AND TTCN.PhieuThanhToanID = CTTT.PhieuThanhToanID AND TTCN.DateOfApplication = CAST(CTTT.NgayThanhToan AS DATE)
 		LEFT JOIN PhieuThanhToanChiTiet TTCT ON TTCT.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
 		LEFT JOIN PhieuThanhToanChiTiet_NganHang TTNH ON TTNH.IDPhieuTTChiTiet = CTTT.IDPhieuTTChiTiet
 		LEFT JOIN TheDichVu DMTDV ON DMTDV.IDTheDichVu = CTTDV.IDDichVuTheChiTiet
@@ -1175,6 +1246,7 @@ Tmp_datcoc AS
 			DMPB.IDPhongBan,
 			DMPB.TenPhongBan,
 			HS.MaHoSo,
+			TTCN.HoSoID,
 			DMKH.MaKHQuanLy,
 			DMKH.HoTen,
 			DMLT.TenLoaiTheDichVu,
@@ -1195,21 +1267,11 @@ Tmp_datcoc AS
 	UNION ALL
 	
 	SELECT -- Dịch vụ con trong cấu hình Thẻ dịch vụ chưa sử dụng
-		 CAST(CTTT.NgayThanhToan AS DATE) AS 'DateOfApplication',
-		 DMPB.IDPhongBan AS 'site_id',
-		 DMPB.TenPhongBan AS 'SiteName',
-		CASE
-			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
-					 THEN N'Thanh toán công nợ'
-			ELSE N'Mua'
-		END AS 'Type',
-		CASE
-	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 
-					 THEN 'PAID_' + HS.MaHoSo
-			ELSE HS.MaHoSo
-		END AS 'Order',
+		CAST(CTTT.NgayThanhToan AS DATE) AS 'DateOfApplication',
+		DMPB.IDPhongBan AS 'site_id',
+		DMPB.TenPhongBan AS 'SiteName',
+		N'Mua' AS 'Type',
+		HS.MaHoSo AS 'Order',
 		DMKH.MaKHQuanLy AS 'CardNumber',
 		DMKH.HoTen AS 'CustomerName',
 		'' AS 'GroupType',
