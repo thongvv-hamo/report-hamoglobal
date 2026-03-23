@@ -29,9 +29,9 @@ class ReportsExport implements FromQuery, WithHeadings, WithChunkReading, WithCo
 
     public function query()
     {
-        $table = $this->type == 'test' ? 'view_raw_reports_test' : 'view_raw_reports';
-        return DB::connection('sqlsrv')
-            ->table($table)
+        $connection = $this->type == 'test' ? 'sqlsrv_test' : 'sqlsrv';
+        return DB::connection($connection)
+            ->table('view_raw_reports')
             ->selectRaw("
                 CAST(DateOfApplication AS datetime) as DateOfApplication, 
                 SiteName,
@@ -52,6 +52,7 @@ class ReportsExport implements FromQuery, WithHeadings, WithChunkReading, WithCo
                 PaymentAmount,
                 DeductfromAccountCard,
                 ExceptionalPayment,
+                DeductfromEmployeeSalary,
                 DeductfromDeposit,
                 CashBranches,
                 PaymentGBPBranches,

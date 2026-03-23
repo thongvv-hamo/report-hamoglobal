@@ -27,10 +27,9 @@ class ReportRepository
         // }
 
         // return DB::connection('sqlsrv')->select($query, [$startDate, $endDate, $siteID]);
-        $table = $type == 'test' ? 'view_raw_reports_test' : 'view_raw_reports';
-
-        return DB::connection('sqlsrv')
-            ->table($table)
+        $connection = $type == 'test' ? 'sqlsrv_test' : 'sqlsrv';
+        return DB::connection($connection)
+            ->table('view_raw_reports')
             ->selectRaw("
                 CAST(DateOfApplication AS datetime) as DateOfApplication, 
                 SiteName,
@@ -51,6 +50,7 @@ class ReportRepository
                 PaymentAmount,
                 DeductfromAccountCard,
                 ExceptionalPayment,
+                DeductfromEmployeeSalary,
                 DeductfromDeposit,
                 CashBranches,
                 PaymentGBPBranches,

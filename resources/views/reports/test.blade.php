@@ -189,6 +189,7 @@
                     { data: 'PaymentAmount', title: 'Số tiền thanh toán', render: $.fn.dataTable.render.number(',', '.', 0) },
                     { data: 'DeductfromAccountCard', title: 'Trừ thẻ TK', render: $.fn.dataTable.render.number(',', '.', 0) },
                     { data: 'ExceptionalPayment', title: 'Thanh toán ngoại lệ', render: $.fn.dataTable.render.number(',', '.', 0) },
+                    { data: 'DeductfromEmployeeSalary', title: 'Trừ lương nhân viên', render: $.fn.dataTable.render.number(',', '.', 0) },
                     { data: 'DeductfromDeposit', title: 'Cấn trừ đặt cọc', render: $.fn.dataTable.render.number(',', '.', 0) },
                     { data: 'CashBranches', title: 'TM các chi nhánh', render: $.fn.dataTable.render.number(',', '.', 0) },
                     { data: 'PaymentGBPBranches', title: 'Thanh toán GBP các chi nhánh', render: $.fn.dataTable.render.number(',', '.', 0) },

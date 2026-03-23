@@ -94,6 +94,22 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'sqlsrv_test' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_TEST_EXT_HOST', 'localhost'),
+            'port' => env('DB_TEST_EXT_PORT', '1433'),
+            'database' => env('DB_TEST_EXT_DATABASE', 'forge'),
+            'username' => env('DB_TEST_EXT_USERNAME', 'forge'),
+            'password' => env('DB_TEST_EXT_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'trust_server_certificate' => 'true'
+            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
+            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
+
     ],
 
     /*
