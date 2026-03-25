@@ -12,7 +12,7 @@
  Target Server Version : 14001000 (14.00.1000)
  File Encoding         : 65001
 
- Date: 18/03/2026 09:03:24
+ Date: 25/03/2026 10:42:31
 */
 
 
@@ -316,7 +316,7 @@ CTTDV_ThanhToanCongNo AS (
 							WHEN MAX(CAST (HH.LoaiHoaHong AS INT)) = 1 THEN
 								FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / 100 AS DECIMAL (18, 0)), 'N0')
 							WHEN MAX(CAST (HH.LoaiHoaHong AS INT)) = 0 THEN
-								FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / cb.TongTienThanhToan AS DECIMAL (18, 0)), 'N0')
+								FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / NULLIF(cb.TongTienThanhToan, 0) AS DECIMAL (18, 0)), 'N0')
 							ELSE
 								N'0'
 						END + N')' AS DisplayName
@@ -479,7 +479,7 @@ CTTDV_ThanhToanCongNo AS (
 						WHEN MAX(CAST (HH.LoaiHoaHong AS INT)) = 1 THEN
 							FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / CTDV.SoLuong / 100 AS DECIMAL(18, 2)), 'N2')
 						WHEN MAX(CAST (HH.LoaiHoaHong AS INT)) = 0 THEN
-							FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / CTDV.SoLuong / cb.TongTienThanhToan AS DECIMAL(18, 2)), 'N2')
+							FORMAT (CAST (MAX(HH.HoaHong) * MAX(CTDV_TienThanhToan) / CTDV.SoLuong / NULLIF(cb.TongTienThanhToan, 0) AS DECIMAL(18, 2)), 'N2')
 						ELSE
 							N'0'
 					END + N')' AS DisplayName
@@ -626,7 +626,7 @@ CTTDV_ThanhToanCongNo AS (
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
 													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTSP_TienThanhToan / 100 AS DECIMAL(18,0)), 'N0')
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
-													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTSP_TienThanhToan / cb.TongTienThanhToan AS DECIMAL(18,0)), 'N0')
+													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTSP_TienThanhToan / NULLIF(cb.TongTienThanhToan, 0) AS DECIMAL(18,0)), 'N0')
 											ELSE N'0'
 									END 
 							+ N')' AS DisplayName
@@ -793,7 +793,7 @@ CTTDV_ThanhToanCongNo AS (
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
 													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / 100 AS DECIMAL(18,0)), 'N0')
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
-													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / cb.TongTienThanhToan AS DECIMAL(18,0)), 'N0')
+													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / NULLIF(cb.TongTienThanhToan, 0) AS DECIMAL(18,0)), 'N0')
 											ELSE N'0'
 									END 
 							+ N')' AS DisplayName
@@ -924,7 +924,7 @@ CTTDV_ThanhToanCongNo AS (
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
 													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / 100 AS DECIMAL(18,0)), 'N0')
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
-													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / cb.TongTienThanhToan AS DECIMAL(18,0)), 'N0')
+													THEN FORMAT(CAST(MAX(HH.HoaHong) * CTGoi_TienThanhToan / NULLIF(cb.TongTienThanhToan, 0) AS DECIMAL(18,0)), 'N0')
 											ELSE N'0'
 									END 
 							+ N')' AS DisplayName
@@ -1209,7 +1209,7 @@ CTTDV_ThanhToanCongNo AS (
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
 												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / 100 AS DECIMAL(18,0)), 'N0')
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
-												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / cb.TongTienThanhToan AS DECIMAL(18,0)), 'N0')
+												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / NULLIF(cb.TongTienThanhToan, 0) AS DECIMAL(18,0)), 'N0')
 											ELSE N'0'
 									END 
 							+ N')' AS DisplayName
@@ -1343,7 +1343,7 @@ CTTDV_ThanhToanCongNo AS (
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 1 
 												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / 100 AS DECIMAL(18,0)), 'N0')
 											WHEN MAX(CAST(HH.LoaiHoaHong AS INT)) = 0 
-												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / cb.TongTienThanhToan AS DECIMAL(18,0)), 'N0')
+												THEN FORMAT(CAST(MAX(HH.HoaHong) * ca.CTTDV_TienThanhToan / NULLIF(cb.TongTienThanhToan, 0) AS DECIMAL(18,0)), 'N0')
 											ELSE N'0'
 									END 
 							+ N')' AS DisplayName
