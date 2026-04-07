@@ -12,7 +12,7 @@
  Target Server Version : 14001000 (14.00.1000)
  File Encoding         : 65001
 
- Date: 25/03/2026 10:42:31
+ Date: 07/04/2026 17:13:59
 */
 
 
@@ -186,6 +186,7 @@ CTTDV_ThanhToanCongNo AS (
 		T.[DeductfromAccountCard],
 		T.[ExceptionalPayment],
 		T.[DeductfromDeposit],
+		NULL AS DeductfromEmployeeSalary,
 		T.[CashBranches],
 		T.[PaymentGBPBranches],
 		T.[PaymentUSDBranches],
@@ -519,16 +520,16 @@ CTTDV_ThanhToanCongNo AS (
 		 DMPB.TenPhongBan AS 'SiteName',
 		CASE
 			-- WHEN HS.MaHoSo LIKE '%_HH0%' THEN N'Hoàn huỷ'
-			WHEN MAX(DCFlag) = 1 THEN N'Đặt cọc' -- Đơn đặt cọc
+			WHEN (SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0)) AND MAX(DCFlag) = 1 THEN N'Đặt cọc' -- Đơn đặt cọc
 			WHEN (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0) AND SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 -- loại trừ đơn đặt cọc
 					 THEN N'Thanh toán công nợ'
 			ELSE N'Mua'
 		END AS 'Type',
 		CASE
 	-- 		WHEN HS.MaHoSo LIKE '%_HH0%' THEN 'RF_' + HS.MaHoSo -- Đơn hoàn huỷ
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND MAX(DCFlag) = 1
+			WHEN (SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0)) AND MAX(DCFlag) = 1
 					 THEN 'PCD_' + HS.MaHoSo -- Đơn đặt cọc
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
+			WHEN (SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0)) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
 					 THEN 'PAID_' + HS.MaHoSo
 			ELSE HS.MaHoSo
 		END AS 'Order',
@@ -539,7 +540,9 @@ CTTDV_ThanhToanCongNo AS (
 		DMNSP.TenNhomSanPham AS 'ProductGroup',
 		DMSP.MaSanPham AS 'Code',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
+			WHEN (SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0)) AND MAX(DCFlag) = 1
+				THEN DMSP.TenSanPham
+			WHEN (SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0)) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0)
 				THEN N'Thanh toán đơn ' + HS.MaHoSo + N' - ' + CONVERT (VARCHAR(10), MIN(HSCN.NgayThanhToan), 103) + N' - ' + DMSP.TenSanPham
 			ELSE DMSP.TenSanPham END AS 'Description',
 		CASE
@@ -549,7 +552,7 @@ CTTDV_ThanhToanCongNo AS (
 				THEN SUM(CASE WHEN CTTT.MaHTTT IN ('TM', 'CK', 'QT') AND CTTT.ThanhTienThanhToan > 0 THEN CTTT.ThanhTienThanhToan ELSE 0 END)
 			ELSE CTSP.DonGia END AS 'UnitPrice',
 		CASE
-			WHEN SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0) 
+			WHEN (SUM(CASE WHEN CTTT.MaHTTT = 'CN' AND CTTT.ThanhTienThanhToan < 0 THEN 1 ELSE 0 END) > 0 OR (MIN(CTTT.MaHTTT) = 'CN' AND SUM(CTTT.ThanhTienThanhToan) = 0)) AND (MAX(DCFlag) IS NULL OR MAX(DCFlag) = 0) 
 				THEN 1
 			ELSE CTSP.SoLuong END AS 'Quantity',
 		CASE
